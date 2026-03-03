@@ -1,0 +1,152 @@
+/* 기본 초기화 */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Suit', sans-serif; }
+body { background-color: white; color: #333; }
+
+/* 스크롤 잠금용 클래스 (JS에서 제어) */
+body.no-scroll { overflow: hidden; }
+
+/* 헤더 */
+.header {
+    width: 100%; height: 60px; border-bottom: 1px solid #ccc;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; position: fixed; top: 0; left: 0; background: white; z-index: 50;
+}
+.header-title { font-size: 18px; font-weight: bold; }
+.back-btn { background: none; border: none; cursor: pointer; padding: 5px; }
+.profile-icon {
+    width: 32px; height: 32px; background-color: #000000; border-radius: 50%;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+    background-size: cover; border: 1px solid #ddd;
+}
+
+/* 컨테이너 */
+.container { width: 100%; max-width: 600px; margin: 80px auto 40px; padding: 0 20px; }
+
+/* 게시글 헤더 */
+.post-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+.post-title { font-size: 24px; font-weight: bold; width: 80%; line-height: 1.3; }
+.post-actions { display: flex; gap: 8px; }
+.action-btn { background: white; border: 1px solid #ccc; padding: 5px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+.action-btn:hover { background: #f0f0f0; }
+
+/* 작성자 정보 */
+.author-info { display: flex; align-items: center; margin-bottom: 15px; font-size: 14px; }
+.profile-img { width: 30px; height: 30px; background-color: #ddd; border-radius: 50%; margin-right: 10px; }
+.author-name { font-weight: bold; margin-right: 15px; }
+.post-date { color: #888; font-size: 12px; }
+
+.divider { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+
+/* 게시글 본문 */
+.post-content { margin-bottom: 30px; }
+.post-image-placeholder {
+    width: 100%; height: 200px; background-color: #eee; border-radius: 8px; margin-bottom: 20px;
+}
+.post-text { line-height: 1.6; font-size: 16px; white-space: pre-line; }
+
+/* 통계 박스 */
+.stats-box {
+    display: flex; gap: 10px; justify-content: flex-start;justify-content: center
+}
+.stat-item {
+    background-color: #f4f5f7; padding: 10px 20px; border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; min-width: 80px;
+}
+.stat-item strong { font-size: 16px; margin-bottom: 4px; }
+.stat-item span { font-size: 12px; color: #666; }
+
+/* 좋아요 버튼 활성화 스타일 */
+.stat-item.clickable { cursor: pointer; user-select: none; }
+.stat-item.active { background-color: #ACA0EB; color: white; }
+.stat-item.active span { color: white; }
+
+/* 댓글 입력 */
+.comment-input-section { margin-bottom: 30px; }
+.comment-input-section textarea {
+    width: 100%; height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 8px;
+    resize: none; font-size: 14px; outline: none; margin-bottom: 10px;
+}
+.comment-input-section textarea:focus { border-color: #7F6AEE; }
+.comment-btn {
+    float: right; padding: 8px 20px; border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; background-color: #ACA0EB; transition: background-color 0.3s;
+}
+.comment-btn:disabled { cursor: default; } /* 비활성 색상은 JS/CSS 조합으로 #ACA0EB 유지 */
+.comment-btn.active { background-color: #7F6AEE; } /* 활성 색상 */
+
+/* 댓글 목록 */
+.comment-list { display: flex; flex-direction: column; gap: 20px; clear: both; padding-top: 20px; }
+.comment-item { display: flex; flex-direction: column; gap: 5px; }
+.comment-meta { display: flex; justify-content: space-between; font-size: 12px; color: #888; }
+.comment-author-row { display: flex; align-items: center; gap: 8px; }
+.comment-actions { display: flex; gap: 5px; }
+.comment-action-btn { background: none; border: 1px solid #eee; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 11px; }
+.comment-content { font-size: 14px; }
+
+/* 모달 (Modal) */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 명세서: 불투명도 50% 블랙 */
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000;
+}
+.modal-overlay.hidden { display: none; }
+
+.modal-box {
+    background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 320px;
+    text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.modal-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+.modal-desc { font-size: 14px; color: #666; margin-bottom: 25px; }
+.modal-buttons { display: flex; gap: 10px; justify-content: center; }
+.modal-btn {
+    padding: 10px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;
+}
+.modal-btn.cancel { background-color: #333; color: white; } /* 디자인 시안의 짙은 회색 */
+.modal-btn.confirm { background-color: #D6C9FF; color: black; } /* 시안의 연보라색 */
+/* 시안 확인: 확인 버튼은 보라색(#7F6AEE or similar)에 흰 글씨가 일반적이나,
+   제공된 모달 이미지(image_e7c835.png)를 보면 '확인'이 연보라 배경에 검은글씨 같습니다.
+   명세서엔 색상 언급이 없으므로 이미지와 최대한 비슷하게 맞춥니다. */
+.modal-btn.confirm { background-color: #C0B0FF; color: #333; }
+
+/* 헤더 프로필 래퍼 */
+.header-profile-wrapper {
+    position: relative;
+    cursor: pointer;
+}
+
+/* 드롭다운 메뉴 박스 */
+.dropdown-menu {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    width: 120px;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 200;
+    border-radius: 5px;
+}
+
+.dropdown-menu.hidden {
+    display: none;
+}
+
+/* 메뉴 아이템 */
+.dropdown-item {
+    display: block;
+    padding: 10px;
+    font-size: 12px;
+    color: #333;
+    text-decoration: none;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    background-color: white; /* 투명 배경 방지 */
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
