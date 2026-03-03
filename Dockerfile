@@ -7,6 +7,5 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY . /usr/share/nginx/html
 
 # 3. 컨테이너 내부에서 login.html을 index.html로 복사 (이게 핵심!)
-RUN cp /usr/share/nginx/html/login.html /usr/share/nginx/html/index.html
-
+COPY login.html /usr/share/nginx/html/index.html
 EXPOSE 80
