@@ -1,24 +1,23 @@
 const BASE_URL = CONFIG.BASE_URL; 
 
+import './header.js'; // Import the common header logic
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. 드롭다운 기능
-    const headerProfileIcon = document.getElementById("headerProfileIcon");
-    const headerDropdown = document.getElementById("headerDropdown");
+    // The header logic is now handled by js/header.js
+    // Only page-specific logic remains here.
 
-    if (headerProfileIcon && headerDropdown) {
-        headerProfileIcon.addEventListener("click", (e) => {
-            e.stopPropagation();
-            headerDropdown.classList.toggle("hidden");
-        });
-
-        document.addEventListener("click", (e) => {
-            if (!headerProfileIcon.contains(e.target) && !headerDropdown.contains(e.target)) {
-                headerDropdown.classList.add("hidden");
+    // Check if user is logged in, otherwise redirect
+    fetch(`${BASE_URL}/users/me`, { credentials: "include" })
+        .then(res => {
+            if (!res.ok) {
+                window.location.href = "login.html";
             }
+        })
+        .catch(e => {
+            console.error("Login check failed:", e);
+            window.location.href = "login.html";
         });
-    }
 
-    // 2. 게시글 작성 로직
+    // 1. 게시글 작성 로직
     const backBtn = document.getElementById("backBtn");
     const titleInput = document.getElementById("title");
     const contentInput = document.getElementById("content");

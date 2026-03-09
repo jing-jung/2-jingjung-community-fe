@@ -1,4 +1,5 @@
 const BASE_URL = CONFIG.BASE_URL; 
+import './header.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
     const backBtn = document.getElementById("backBtn");
@@ -9,10 +10,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     const helperText = document.getElementById("helperText");
     const submitBtn = document.getElementById("submitBtn");
-    
-    const headerProfileIcon = document.getElementById("headerProfileIcon");
-    const headerDropdown = document.getElementById("headerDropdown");
 
+    
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get("id");
 
@@ -21,19 +20,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.location.href = "posts.html";
         return;
     }
-
-
-    if (headerProfileIcon && headerDropdown) {
-        headerProfileIcon.addEventListener("click", (e) => {
-            e.stopPropagation();
-            headerDropdown.classList.toggle("hidden");
-        });
-        document.addEventListener("click", (e) => {
-            if (!headerProfileIcon.contains(e.target) && !headerDropdown.contains(e.target)) {
-                headerDropdown.classList.add("hidden");
+    
+    // Check if user is logged in, otherwise redirect
+    fetch(`${BASE_URL}/users/me`, { credentials: "include" })
+        .then(res => {
+            if (!res.ok) {
+                window.location.href = "login.html";
             }
+        })
+        .catch(e => {
+            console.error("Login check failed:", e);
+            window.location.href = "login.html";
         });
-    }
 
     // 뒤로가기
     if (backBtn) {

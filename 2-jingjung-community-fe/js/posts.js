@@ -1,6 +1,7 @@
 import { CONFIG } from './config.js';
 const BASE_URL = CONFIG.BASE_URL;
 
+import './header.js'; // Import the common header logic
 document.addEventListener("DOMContentLoaded", () => {
     // 1. 요소 가져오기
     const postList = document.getElementById("postList");
@@ -8,46 +9,40 @@ document.addEventListener("DOMContentLoaded", () => {
     const loadingSentinel = document.getElementById("loadingSentinel");
     
     // 헤더 프로필
-    const headerProfileIcon = document.getElementById("headerProfileIcon");
-    const headerDropdown = document.getElementById("headerDropdown");
+    // The header logic is now handled by js/header.js
+    // Only page-specific logic remains here.
 
-    // 2. 헤더 내 프로필 사진 로딩 (목록 페이지에서도 필요)
-    async function loadMyProfile() {
+    // Check if user is logged in to show/hide write button
+    async function checkLoginStatus() {
         try {
-            const res = await fetch(`${BASE_URL}/users/me`, { 
-                credentials: "include" });
-            if (res.ok) {
-                const user = await res.json();
-                if (user.profile_image && headerProfileIcon) {
-                    let imgUrl = user.profile_image;
-                    if (!imgUrl.startsWith("http")) imgUrl = BASE_URL + imgUrl;
-                    
-                    headerProfileIcon.style.backgroundImage = `url('${imgUrl}')`;
-                    headerProfileIcon.style.backgroundSize = "cover"; 
-                    headerProfileIcon.style.backgroundColor = "transparent";
-                }
+            const res = await fetch(`${BASE_URL}/users/me`, { credentials: "include" });
+            if (!res.ok && res.status === 401) {
+                if(writeBtn) writeBtn.style.display = 'none';
             }
         } catch (e) {
-            console.error("프로필 로딩 실패:", e);
+            console.error("Login status check failed:", e);
+            if(writeBtn) writeBtn.style.display = 'none';
         }
     }
-    loadMyProfile();
+    checkLoginStatus();
 
-    if (headerProfileIcon && headerDropdown) {
-        headerProfileIcon.addEventListener("click", (e) => {
-            e.stopPropagation();
-            headerDropdown.classList.toggle("hidden");
-        });
-        document.addEventListener("click", (e) => {
-            if (!headerProfileIcon.contains(e.target) && !headerDropdown.contains(e.target)) {
-                headerDropdown.classList.add("hidden");
-            }
-        });
-    }
-
+    // 2. 게시글 작성 버튼
     if (writeBtn) {
         writeBtn.addEventListener("click", () => {
-            window.location.href = "write_post.html"; 
+            // Check if user is logged in before redirecting
+            fetch(`${BASE_URL}/users/me`, { credentials: "include" })
+                .then(res => {
+                    if (res.ok) {
+                        window.location.href = "write_post.html"; 
+                    } else {
+                        alert("로그인이 필요합니다.");
+                        window.location.href = "login.html";
+                    }
+                })
+                .catch(e => {
+                    console.error("Login check failed:", e);
+                    alert("로그인 상태 확인 중 오류가 발생했습니다.");
+                });
         });
     }
 
@@ -60,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-}
+    }
 
     let currentOffset = 0;
     const limit = 10;
@@ -78,7 +73,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return [];
         }
     }
-
+    window.location.href = `chat.html?recipientId=${authorId}`;
+    
     // 게시글 렌더링 
     function renderPosts(posts) {
         posts.forEach(post => {

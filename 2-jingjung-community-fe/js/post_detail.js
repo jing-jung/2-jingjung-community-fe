@@ -1,7 +1,7 @@
 const BASE_URL = CONFIG.BASE_URL; 
+import './header.js'; // Import the common header logic
 
-document.addEventListener("DOMContentLoaded", async () => {
-    // 1. 요소 가져오기
+document.addEventListener("DOMContentLoaded", async () => {    // 1. 요소 가져오기
     const backBtn = document.getElementById("backBtn");
     
     // 게시글 관련 요소
@@ -24,15 +24,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const commentInput = document.getElementById("commentInput");
     const commentSubmitBtn = document.getElementById("commentSubmitBtn");
     const commentList = document.getElementById("commentList");
-
+    
     const deleteModal = document.getElementById("deleteModal");
     const modalCancelBtn = document.getElementById("modalCancelBtn");
     const modalConfirmBtn = document.getElementById("modalConfirmBtn");
     const modalTitle = document.querySelector(".modal-title");
     
-    const headerProfileIcon = document.getElementById("headerProfileIcon");
-    const headerDropdown = document.getElementById("headerDropdown");
-
+    // The header logic is now handled by js/header.js
+    // Only page-specific logic remains here.
+    
     let currentPostId = null;
     let currentDeleteTarget = null;
     let editModeCommentId = null; 
@@ -40,36 +40,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 2. 초기 세팅 & 헤더 내 정보 불러오기
     async function loadMyProfile() {
         try {
+            // This function is now only used to check login status for displaying chat button
             const res = await fetch(`${BASE_URL}/users/me`, { credentials: "include" });
-            if (res.ok) {
-                const user = await res.json();
-                if (user.profile_image && headerProfileIcon) {
-                    // 이미지 경로 처리
-                    let imgUrl = user.profile_image;
-                    if (!imgUrl.startsWith("http")) imgUrl = BASE_URL + imgUrl;
-                    
-                    headerProfileIcon.style.backgroundImage = `url('${imgUrl}')`;
-                    headerProfileIcon.style.backgroundSize = "cover";
-                    headerProfileIcon.style.backgroundColor = "transparent"; 
-                }
-            }
+            if (!res.ok) return null; // Not logged in
+            const user = await res.json();
+            return user.id; // Return current user's ID
         } catch (e) {
-            console.error("내 정보 로딩 실패:", e);
+            console.error("Login status check failed:", e);
+            return null;
         }
     }
-    loadMyProfile(); 
-
-    if (headerProfileIcon && headerDropdown) {
-        headerProfileIcon.addEventListener("click", (e) => {
-            e.stopPropagation();
-            headerDropdown.classList.toggle("hidden");
-        });
-        document.addEventListener("click", (e) => {
-            if (!headerProfileIcon.contains(e.target) && !headerDropdown.contains(e.target)) {
-                headerDropdown.classList.add("hidden");
-            }
-        });
-    }
+    // loadMyProfile() is no longer called directly here, its logic is in header.js
 
     if(backBtn) {
         backBtn.addEventListener("click", () => {
@@ -120,11 +101,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    function renderPost(post) {
+    async function renderPost(post) {
         postTitle.textContent = post.title;
         postText.textContent = post.content;
         authorName.textContent = post.author_nickname;
         postDate.textContent = post.created_at;
+
+            // Add 1:1 chat button
+            const chatWithAuthorBtn = document.getElementById("chatWithAuthorBtn");
+            if (chatWithAuthorBtn) {
+                const currentUserId = await loadMyProfile(); // Get current user ID
+                if (currentUserId && post.user_id !== currentUserId) { // Don't show chat with self
+                    chatWithAuthorBtn.style.display = "inline-block";
+                    chatWithAuthorBtn.onclick = () => {
+                        window.location.href = `chat.html?recipientId=${post.user_id}`;
+                    };
+                }
+            }
         
         // 작성자 프로필 이미지
         if (post.author_profile_image && authorProfileImg) {

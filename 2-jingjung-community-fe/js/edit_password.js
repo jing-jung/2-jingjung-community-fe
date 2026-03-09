@@ -1,8 +1,8 @@
 const BASE_URL = CONFIG.BASE_URL; 
 
+import './header.js'; // Import the common header logic
 document.addEventListener("DOMContentLoaded", () => {
-    const headerDropdown = document.getElementById("headerDropdown");
-    
+
     const passwordInput = document.getElementById("password");
     const passwordError = document.getElementById("passwordError");
     
@@ -15,18 +15,17 @@ document.addEventListener("DOMContentLoaded", () => {
     let isPasswordValid = false;
     let isPasswordConfirmValid = false;
 
-
-    if (headerProfileIcon && headerDropdown) {
-        headerProfileIcon.addEventListener("click", (e) => {
-            e.stopPropagation();
-            headerDropdown.classList.toggle("hidden");
-        });
-        document.addEventListener("click", (e) => {
-            if (!headerProfileIcon.contains(e.target) && !headerDropdown.contains(e.target)) {
-                headerDropdown.classList.add("hidden");
+    // Check if user is logged in, otherwise redirect
+    fetch(`${BASE_URL}/users/me`, { credentials: "include" })
+        .then(res => {
+            if (!res.ok) {
+                window.location.href = "login.html";
             }
+        })
+        .catch(e => {
+            console.error("Login check failed:", e);
+            window.location.href = "login.html";
         });
-    }
 
 
     function validatePassword() {

@@ -1,9 +1,9 @@
 const BASE_URL = CONFIG.BASE_URL; 
 
+import './header.js'; // Import the common header logic
 document.addEventListener("DOMContentLoaded", () => {
-    const headerProfileIcon = document.getElementById("headerProfileIcon");
-    const headerDropdown = document.getElementById("headerDropdown");
-    
+    // The header logic is now handled by js/header.js
+    // Only page-specific logic remains here.
     const nicknameInput = document.getElementById("nickname");
     const nicknameError = document.getElementById("nicknameError");
     const submitBtn = document.getElementById("submitBtn");
@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const toastMessage = document.getElementById("toastMessage");
     const profileInput = document.getElementById("profileInput");
-    const profileImgCircle = document.querySelector(".profile-img-circle");
     
     const emailText = document.querySelector(".email-text");
 
@@ -40,10 +39,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (emailText) emailText.textContent = user.email;
             nicknameInput.value = user.nickname;
 
+            const profileImgCircle = document.querySelector(".profile-img-circle"); // Get it here as it's page-specific
+            const headerProfileIcon = document.getElementById("headerProfileIcon"); // Get it here as it's page-specific
             if (user.profile_image) {
                 let imgUrl = user.profile_image;
                 if (!imgUrl.startsWith("http")) imgUrl = BASE_URL + imgUrl;
                 profileImgCircle.style.backgroundImage = `url('${imgUrl}')`;
+                headerProfileIcon.style.backgroundImage = `url('${imgUrl}')`; // 헤더 아이콘에도 적용
+                headerProfileIcon.style.backgroundSize = "cover";
             }
 
         } catch (error) {
@@ -55,17 +58,17 @@ document.addEventListener("DOMContentLoaded", () => {
     
     loadUserData();
 
-    if (headerProfileIcon && headerDropdown) {
-        headerProfileIcon.addEventListener("click", (e) => {
-            e.stopPropagation();
-            headerDropdown.classList.toggle("hidden");
-        });
-        document.addEventListener("click", (e) => {
-            if (!headerProfileIcon.contains(e.target) && !headerDropdown.contains(e.target)) {
-                headerDropdown.classList.add("hidden");
+    // Check if user is logged in, otherwise redirect
+    fetch(`${BASE_URL}/users/me`, { credentials: "include" })
+        .then(res => {
+            if (!res.ok) {
+                window.location.href = "login.html";
             }
+        })
+        .catch(e => {
+            console.error("Login check failed:", e);
+            window.location.href = "login.html";
         });
-    }
 
     profileInput.addEventListener("change", (e) => {
         const file = e.target.files[0];
