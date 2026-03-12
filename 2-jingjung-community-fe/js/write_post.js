@@ -1,11 +1,7 @@
 const BASE_URL = CONFIG.BASE_URL; 
 
-import './header.js'; // Import the common header logic
+import './header.js'; 
 document.addEventListener("DOMContentLoaded", () => {
-    // The header logic is now handled by js/header.js
-    // Only page-specific logic remains here.
-
-    // Check if user is logged in, otherwise redirect
     fetch(`${BASE_URL}/users/me`, { credentials: "include" })
         .then(res => {
             if (!res.ok) {

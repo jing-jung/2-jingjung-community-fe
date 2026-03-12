@@ -12,9 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // The header logic is now handled by js/header.js
-    // Only page-specific logic remains here.
-
     let currentUserId;
     try {
         const meResponse = await fetch(`${API_BASE_URL}/users/me`, { credentials: "include" });

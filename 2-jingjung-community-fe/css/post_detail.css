@@ -103,12 +103,8 @@ body.no-scroll { overflow: hidden; }
 }
 .modal-btn.cancel { background-color: #333; color: white; } /* 디자인 시안의 짙은 회색 */
 .modal-btn.confirm { background-color: #D6C9FF; color: black; } /* 시안의 연보라색 */
-/* 시안 확인: 확인 버튼은 보라색(#7F6AEE or similar)에 흰 글씨가 일반적이나,
-   제공된 모달 이미지(image_e7c835.png)를 보면 '확인'이 연보라 배경에 검은글씨 같습니다.
-   명세서엔 색상 언급이 없으므로 이미지와 최대한 비슷하게 맞춥니다. */
 .modal-btn.confirm { background-color: #C0B0FF; color: #333; }
 
-/* 헤더 프로필 래퍼 */
 .header-profile-wrapper {
     position: relative;
     cursor: pointer;

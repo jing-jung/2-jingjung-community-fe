@@ -1,16 +1,13 @@
 import { CONFIG } from './config.js';
-import './header.js'; // Import the common header logic
+import './header.js'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const API_BASE_URL = `http://${CONFIG.BASE_URL}`;
 
-    // Check if user is logged in, otherwise redirect
     fetch(`${API_BASE_URL}/users/me`, { credentials: "include" })
         .then(res => { if (!res.ok) window.location.href = "login.html"; })
         .catch(e => { console.error("Login check failed:", e); window.location.href = "login.html"; });
 
-    // The header logic is now handled by js/header.js
-    // Only page-specific logic remains here.
     const chatListContainer = document.getElementById('chat-list-container');
 
     const fetchChatList = async () => {
@@ -30,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderChatList = (chats) => {
-        chatListContainer.innerHTML = ''; // Clear existing list
+        chatListContainer.innerHTML = ''; 
         if (chats.length === 0) {
             chatListContainer.innerHTML = '<p>진행중인 대화가 없습니다.</p>';
             return;

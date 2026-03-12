@@ -1,6 +1,6 @@
 const BASE_URL = CONFIG.BASE_URL; 
 
-import './header.js'; // Import the common header logic
+import './header.js'; 
 document.addEventListener("DOMContentLoaded", () => {
 
     const passwordInput = document.getElementById("password");

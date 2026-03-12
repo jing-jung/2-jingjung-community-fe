@@ -2,8 +2,6 @@ const BASE_URL = CONFIG.BASE_URL;
 
 import './header.js'; // Import the common header logic
 document.addEventListener("DOMContentLoaded", () => {
-    // The header logic is now handled by js/header.js
-    // Only page-specific logic remains here.
     const nicknameInput = document.getElementById("nickname");
     const nicknameError = document.getElementById("nicknameError");
     const submitBtn = document.getElementById("submitBtn");

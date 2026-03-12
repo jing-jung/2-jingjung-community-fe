@@ -29,10 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {    // 1. 요소 가�
     const modalCancelBtn = document.getElementById("modalCancelBtn");
     const modalConfirmBtn = document.getElementById("modalConfirmBtn");
     const modalTitle = document.querySelector(".modal-title");
-    
-    // The header logic is now handled by js/header.js
-    // Only page-specific logic remains here.
-    
+        
     let currentPostId = null;
     let currentDeleteTarget = null;
     let editModeCommentId = null; 
@@ -50,7 +47,6 @@ document.addEventListener("DOMContentLoaded", async () => {    // 1. 요소 가�
             return null;
         }
     }
-    // loadMyProfile() is no longer called directly here, its logic is in header.js
 
     if(backBtn) {
         backBtn.addEventListener("click", () => {
