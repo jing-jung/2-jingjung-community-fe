@@ -2,41 +2,50 @@ import { CONFIG } from './config.js';
 const BASE_URL = CONFIG.BASE_URL;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Dynamically add header.css to the head
-    const head = document.head;
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = './css/header.css'; // Assuming header.css is in the css folder
-    head.appendChild(link);
+    const headerPlaceholder = document.getElementById('header-placeholder');
 
-    // Create a placeholder for the header
-    const headerPlaceholder = document.createElement('div');
-    headerPlaceholder.id = 'header-placeholder'; // Give it an ID for easier targeting
-    document.body.prepend(headerPlaceholder);
-
-    // Fetch header.html content
-    fetch('header.html')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text();
-        })
-        .then(data => {
-            headerPlaceholder.innerHTML = data;
-            initializeHeader();
-        })
-        .catch(error => {
-            console.error('Error fetching header:', error);
-            headerPlaceholder.innerHTML = '<p style="text-align: center; color: red;">Error loading header.</p>';
-        });
+    if (headerPlaceholder) {
+        fetch('header.html')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                headerPlaceholder.innerHTML = data;
+                initializeHeader();
+            })
+            .catch(error => {
+                console.error('Error fetching header:', error);
+                headerPlaceholder.innerHTML = '<p style="text-align: center; color: red;">Error loading header.</p>';
+            });
+    }
 });
 
 function initializeHeader() {
+    const headerBackBtn = document.getElementById('headerBackBtn');
+    const headerTitle = document.getElementById('headerTitle');
     const headerProfileIcon = document.getElementById('headerProfileIcon');
     const headerDropdown = document.getElementById('headerDropdown');
     const logoutBtn = document.getElementById('logoutBtn');
     const chatNotificationDot = document.getElementById("chat-notification-dot");
+
+    // Conditional display for header title/back button
+    if (window.location.pathname.endsWith('/posts.html') || window.location.pathname === '/') {
+        if (headerTitle) headerTitle.style.display = 'block';
+        if (headerBackBtn) headerBackBtn.style.display = 'none';
+    } else {
+        if (headerTitle) headerTitle.style.display = 'none';
+        if (headerBackBtn) headerBackBtn.style.display = 'block';
+    }
+
+    if (headerBackBtn) {
+        headerBackBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            history.back();
+        });
+    }
 
     async function loadMyProfile() {
         try {
