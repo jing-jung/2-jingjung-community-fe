@@ -27,3 +27,11 @@ jobs:
           # 프론트엔드 ECR 리포지토리 이름(community-fe) 확인
           docker build -t ${{ steps.login-ecr.outputs.registry }}/community-fe:latest .
           docker push ${{ steps.login-ecr.outputs.registry }}/community-fe:latest
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name community-eks-cluster --region ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to EKS
+        run: |
+          kubectl rollout restart deployment frontend-deployment
