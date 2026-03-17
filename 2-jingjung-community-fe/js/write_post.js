@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 3. 서버로 전송 
         try {
-            const response = await fetch(`${BASE_URL}/api/posts`, {
+            const response = await fetch(`${BASE_URL}/posts`, {
                 method: "POST",
                 credentials: "include", 
                 body: formData 

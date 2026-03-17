@@ -70,7 +70,7 @@ function initializeHeader() {
     
     async function checkUnreadMessages() {
         try {
-            const res = await fetch(`${BASE_URL}/api/chats`, { credentials: "include" });
+            const res = await fetch(`${BASE_URL}/chats`, { credentials: "include" });
             if (res.ok) {
                 const data = await res.json();
                 const totalUnread = data.chats.reduce((sum, chat) => sum + chat.unread_count, 0);

@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const fetchChatHistory = async (currentChatId) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/chats/${currentChatId}/messages`, { credentials: "include" });
+            const response = await fetch(`${API_BASE_URL}/chats/${currentChatId}/messages`, { credentials: "include" });
             if (response.ok) {
                 const data = await response.json();
                 messageContainer.innerHTML = ''; // Clear placeholder messages
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const initiateChat = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/chats`, {
+            const response = await fetch(`${API_BASE_URL}/chats`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }, // credentials: "include" will handle the cookie
                 body: JSON.stringify({ recipient_id: parseInt(recipientId) })

@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         try {
-            const response = await fetch(`${BASE_URL}/api/posts/${postId}`, {
+            const response = await fetch(`${BASE_URL}/posts/${postId}`, {
                 method: "PUT",
                 credentials: "include",
                 body: formData
