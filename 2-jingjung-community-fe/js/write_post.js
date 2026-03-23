@@ -1,6 +1,5 @@
+import { CONFIG } from './config.js';
 const BASE_URL = CONFIG.BASE_URL; 
-
-import './header.js'; 
 document.addEventListener("DOMContentLoaded", () => {
     fetch(`${BASE_URL}/users/me`, { credentials: "include" })
         .then(res => {
@@ -24,9 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitBtn = document.getElementById("submitBtn");
 
     // 뒤로가기
-    backBtn.addEventListener("click", () => {
-        window.location.href = "posts.html";
-    });
+    if (backBtn) {
+        backBtn.addEventListener("click", () => {
+            window.location.href = "posts.html";
+        });
+    }
 
     // 이미지 선택 시 파일명 표시
     imageInput.addEventListener("change", (e) => {

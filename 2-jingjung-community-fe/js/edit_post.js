@@ -100,7 +100,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const formData = new FormData();
         formData.append("title", titleValue);
         formData.append("content", contentValue);
-        formData.append("_method", "PUT");
         
         if (imageFile) {
             formData.append("image", imageFile);
@@ -108,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         try {
             const response = await fetch(`${BASE_URL}/posts/${postId}`, {
-                method: "POST",
+                method: "PUT",
                 credentials: "include",
                 body: formData
             });
