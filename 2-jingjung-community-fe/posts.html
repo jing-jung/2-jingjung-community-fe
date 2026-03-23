@@ -41,6 +41,32 @@
             </div>
 
         <div id="loadingSentinel" class="loading-sentinel">Loading...</div>
+    
+        <button id="trainBtn" class="train-floating-btn" title="기차표 예매">
+        <img src="./images/move_24.png" alt="기차"> </button>
+
+    <div id="trainModal" class="modal-overlay hidden">
+        <div class="train-modal-box">
+            <div class="leaf-icon"><img src="./images/leaf_1.png" alt="나뭇잎"></div> <h3 class="train-title">너굴 레일 시간표</h3>
+            <p class="train-desc">원하시는 출발 시간의 표를 예매해주세요구리!</p>
+            
+            <div class="timetable-list" id="timetableList">
+                </div>
+            
+            <button id="closeTrainModal" class="turnip-close-btn">닫기</button>
+        </div>
+    </div>
+
+    <div id="queueModal" class="modal-overlay hidden">
+        <div class="queue-box">
+            <div class="spinner"></div>
+            <h3>접속 대기 중...</h3>
+            <p style="font-size: 14px; color: #666; margin-top: 10px;">
+                예매 대기 인원이 많아 접속 대기 중입니다.<br>잠시만 기다려주세요.
+            </p>
+            <p class="queue-count">내 앞에 대기자: <span id="queueNumber">142</span>명</p>
+        </div>
+    </div>
     </main>
 
     <script type="module" src="./js/config.js"></script>

@@ -195,4 +195,88 @@ document.addEventListener("DOMContentLoaded", () => {
             currentOffset += newPosts.length;
         })();
     }
+    // =========================================
+    // 기차표 & 대기열 시스템 로직 (추가)
+    // =========================================
+    const trainBtn = document.getElementById("trainBtn");
+    const trainModal = document.getElementById("trainModal");
+    const closeTrainModal = document.getElementById("closeTrainModal");
+    const timetableList = document.getElementById("timetableList");
+    
+    const queueModal = document.getElementById("queueModal");
+    const queueNumberSpan = document.getElementById("queueNumber");
+
+    // 1. 시간표 자동 생성 함수 (현재 시간 기준으로 마감 처리)
+    function renderTimetable() {
+        timetableList.innerHTML = "";
+        const now = new Date();
+        const currentHour = now.getHours();
+
+        // 아침 9시부터 밤 10시(22시)까지 기차가 있다고 가정
+        for (let i = 9; i <= 22; i++) {
+            const row = document.createElement("div");
+            // i(출발시간)가 현재 시간보다 작거나 같으면 마감(past)
+            const isPast = i <= currentHour; 
+            
+            row.className = `timetable-row ${isPast ? 'past' : ''}`;
+            
+            // 시간 포맷 (예: 9 -> 09:00)
+            const timeString = `${i < 10 ? '0'+i : i}:00 출발`;
+            
+            row.innerHTML = `
+                <div class="time-info">${timeString}</div>
+                <button class="reserve-btn">${isPast ? '마감' : '예매'}</button>
+            `;
+
+            // 예매 가능한 버튼에만 클릭 이벤트 추가
+            if (!isPast) {
+                const btn = row.querySelector('.reserve-btn');
+                btn.addEventListener("click", () => {
+                    startReservationQueue();
+                });
+            }
+            timetableList.appendChild(row);
+        }
+    }
+
+    // 2. KTX 대기열 시작 로직
+    function startReservationQueue() {
+        trainModal.classList.add("hidden"); // 시간표 닫기
+        queueModal.classList.remove("hidden"); // 대기열 창 띄우기
+        
+        // 50명 ~ 250명 사이의 가짜 대기자 수 생성
+        let waitNumber = Math.floor(Math.random() * 200) + 50; 
+        queueNumberSpan.textContent = waitNumber;
+
+        // 0.4초마다 대기자 숫자가 무작위로 줄어드는 애니메이션
+        const interval = setInterval(() => {
+            waitNumber -= Math.floor(Math.random() * 10) + 5; 
+            
+            if (waitNumber <= 0) {
+                clearInterval(interval); // 타이머 종료
+                queueModal.classList.add("hidden"); // 대기열 닫기
+                alert("기차표 예매가 완료되었습니다구리! 즐거운 여행 되세요! ✈️");
+                document.body.classList.remove("no-scroll");
+            } else {
+                queueNumberSpan.textContent = waitNumber; // 화면 숫자 업데이트
+            }
+        }, 400); 
+    }
+
+    // 3. 기차 버튼 클릭 시 모달 열기
+    if (trainBtn) {
+        trainBtn.addEventListener("click", () => {
+            renderTimetable(); // 모달 열 때마다 시간표 새로 계산
+            trainModal.classList.remove("hidden");
+            document.body.classList.add("no-scroll");
+        });
+    }
+
+    // 4. 시간표 닫기 버튼
+    if (closeTrainModal) {
+        closeTrainModal.addEventListener("click", () => {
+            trainModal.classList.add("hidden");
+            document.body.classList.remove("no-scroll");
+        });
+    }
 });

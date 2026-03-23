@@ -291,3 +291,173 @@ body.no-scroll {
     cursor: pointer;
     text-decoration: underline;
 }
+
+/* =========================================
+   기차표 & 대기열 시스템 스타일
+========================================= */
+
+/* 기차 플로팅 버튼 (무 버튼(bottom 30px) 위에 배치) */
+.train-floating-btn {
+    position: fixed;
+    bottom: 100px; /* 무 버튼 위로 띄움 */
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #78C484; /* 동숲 초록색 */
+    border: 3px solid #5EAB6B;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 90;
+    transition: transform 0.2s;
+}
+
+.train-floating-btn:hover {
+    transform: scale(1.1);
+}
+
+.train-floating-btn img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+/* 기차 모달 박스 (초록 둥근 테두리 + 3번 사진 배경 느낌) */
+.train-modal-box {
+    background-color: #FDF6E3; 
+    border: 6px solid #78C484; 
+    padding: 30px 20px;
+    border-radius: 25px;
+    width: 90%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+/* 나뭇잎 마크 (틀 중앙 위) */
+.leaf-icon {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #FDF6E3;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.leaf-icon img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.train-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #795548;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.train-desc {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+/* 시간표 리스트 (스크롤 가능하게) */
+.timetable-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    max-height: 40vh; /* 너무 길어지면 안에서 스크롤 */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* 시간표 행 */
+.timetable-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    border: 2px solid #E6D5B8;
+    padding: 12px 15px;
+    border-radius: 15px;
+}
+
+/* 시간 지났을 때 회색 처리 */
+.timetable-row.past {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+    color: #aaa;
+}
+
+.time-info {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.reserve-btn {
+    background-color: #D3A13B;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 시간 지난 버튼은 못 누르게 */
+.timetable-row.past .reserve-btn {
+    background-color: #ccc;
+    cursor: not-allowed;
+    pointer-events: none; 
+}
+
+/* KTX 대기열 팝업 스타일 */
+.queue-box {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    width: 80%;
+    max-width: 320px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    border: 2px solid #78C484;
+}
+
+/* 빙글빙글 도는 로딩 애니메이션 */
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 6px solid #E6D5B8;
+    border-top: 6px solid #78C484;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.queue-count {
+    margin-top: 25px;
+    font-weight: bold;
+    color: #FF5A5A;
+    font-size: 18px;
+    background-color: #FFF0F0;
+    padding: 10px;
+    border-radius: 10px;
+}
