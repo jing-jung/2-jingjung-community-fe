@@ -30,6 +30,8 @@ function initializeHeader() {
     const headerDropdown = document.getElementById('headerDropdown');
     const logoutBtn = document.getElementById('logoutBtn');
     const chatNotificationDot = document.getElementById("chat-notification-dot");
+    const headerMessageBtn = document.getElementById('headerMessageBtn'); // 새로 추가된 부분
+
 
     // Conditional display for header title/back button
     if (window.location.pathname.endsWith('/posts.html') || window.location.pathname === '/') {
@@ -44,6 +46,13 @@ function initializeHeader() {
         headerBackBtn.addEventListener('click', (e) => {
             e.preventDefault();
             history.back();
+        });
+    }
+
+    // 편지 아이콘 클릭 시 채팅 목록 페이지로 이동
+    if (headerMessageBtn) {
+        headerMessageBtn.addEventListener('click', () => {
+            window.location.href = 'chatlist.html';
         });
     }
 

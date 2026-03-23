@@ -1,15 +1,23 @@
 <header class="header">
-    <a href="posts.html" id="headerTitle" class="header-title">징정 커뮤니티</a>
+    <a href="posts.html" id="headerTitle" class="header-title">아무 말 대잔치</a>
     <a href="#" id="headerBackBtn" class="header-back-btn" style="display: none;">&lt;</a>
-    <div class="header-profile-wrapper">
-        <div id="headerProfileIcon" class="profile-icon"></div>
-        <div id="headerDropdown" class="dropdown-menu hidden">
-            <a href="edit_profile.html" class="dropdown-item">내 정보</a>
-            <a href="edit_password.html" class="dropdown-item">비밀번호 변경</a>
-            <a href="chatlist.html" class="dropdown-item">
-                내 채팅 <span id="chat-notification-dot" class="notification-dot hidden"></span>
-            </a>
-            <a href="#" id="logoutBtn" class="dropdown-item">로그아웃</a>
+    
+    <div class="header-right-actions">
+        <div class="bell-container">
+            <div class="bell-icon">💰</div> <span class="bell-amount">2,000</span>
+        </div>
+
+        <div class="message-icon-wrapper" id="headerMessageBtn" title="내 채팅">
+            <div class="message-icon">✉️</div> <span id="chat-notification-dot" class="notification-dot hidden"></span>
+        </div>
+
+        <div class="header-profile-wrapper">
+            <div id="headerProfileIcon" class="profile-icon"></div>
+            <div id="headerDropdown" class="dropdown-menu hidden">
+                <a href="edit_profile.html" class="dropdown-item">내 정보</a>
+                <a href="edit_password.html" class="dropdown-item">비밀번호 변경</a>
+                <a href="#" id="logoutBtn" class="dropdown-item">로그아웃</a>
+            </div>
         </div>
     </div>
 </header>
