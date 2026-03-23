@@ -1,3 +1,4 @@
+/* 기본 초기화 */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -5,124 +6,83 @@
     font-family: 'Suit', sans-serif;
 }
 
+/* 너굴폰 특유의 민트색 + 하얀색 그리드(모눈) 패턴 */
 body {
-    background-color: #f4f5f7;
+    background-color: #E0F8F5;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.6) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.6) 2px, transparent 2px);
+    background-size: 30px 30px;
+    background-attachment: fixed;
     color: #333;
-}
-
-/* Main Container */
-.container {
-    width: 100%;
-    max-width: 500px;
-    margin: 80px auto 20px; /* Adjust for fixed header */
-    padding: 0 20px;
-}
-
-/* Chatlist Header */
-.chatlist-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-.chatlist-header h2 {
-    flex-grow: 1;
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.back-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #333;
-    padding: 0 10px;
-}
-
-/* Chat List Container */
-.chat-list-container {
+    padding-top: 80px;
+    
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    align-items: center; 
 }
 
-/* Chat Item */
-.chat-item {
+.chatlist-container {
+    width: 100%;
+    max-width: 500px; /* 딱 스마트폰 너비만큼만 차지함 */
+    padding: 20px;
+}
+
+.chatlist-title {
+    font-size: 24px;
+    font-weight: 900;
+    color: #4DB6AC; /* 진한 민트색 */
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 0px #fff;
+}
+
+/* 채팅방 목록 리스트 */
+.chat-room-item {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 3px solid #B2DFDB;
+    border-radius: 20px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
-    background-color: white;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     cursor: pointer;
-    transition: background-color 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 150, 136, 0.1);
+    transition: transform 0.2s, background-color 0.2s;
 }
 
-.chat-item:hover {
-    background-color: #f9f9f9;
+.chat-room-item:hover {
+    transform: translateY(-2px);
+    background-color: #fff;
+    border-color: #4DB6AC;
 }
 
-.profile-img {
+/* 프로필 사진 */
+.chat-profile-img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: #ddd;
-    background-size: cover;
-    background-position: center;
+    border: 2px solid #E0F8F5;
+    object-fit: cover;
     margin-right: 15px;
-    flex-shrink: 0; /* Prevent shrinking */
 }
 
-.chat-details {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    overflow: hidden; /* For ellipsis */
-}
-
-.chat-partner-name {
-    font-weight: bold;
-    font-size: 16px;
-    margin-bottom: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.last-message {
-    font-size: 14px;
-    color: #666;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
+/* 텍스트 정보 */
 .chat-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-left: 10px;
-    flex-shrink: 0; /* Prevent shrinking */
+    flex: 1;
+    overflow: hidden;
 }
 
-.last-message-time {
-    font-size: 12px;
-    color: #999;
+.chat-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #795548; /* 동숲 갈색 */
     margin-bottom: 5px;
 }
 
-.unread-count {
-    background-color: #ACA0EB; /* Primary color */
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 12px;
-    padding: 2px 8px;
-    min-width: 24px;
-    text-align: center;
+.chat-last-msg {
+    font-size: 13px;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
