@@ -54,10 +54,9 @@ body {
 
 .bell-icon {
     font-size: 16px;
-    /* 나중에 실제 이미지 적용 시 아래 주석 해제 후 사용하세요 */
-    /* width: 20px; height: 20px; 
-       background-image: url('../images/bell.png'); 
-       background-size: cover; */
+    width: 20px; height: 20px; 
+    background-image: url('../images/bell_3.png'); 
+    background-size: cover;
 }
 
 .bell-amount {
@@ -77,10 +76,9 @@ body {
 
 .message-icon {
     font-size: 22px;
-    /* 나중에 실제 이미지 적용 시 아래 주석 해제 후 사용하세요 */
-    /* width: 28px; height: 28px; 
-       background-image: url('../images/letter.png'); 
-       background-size: cover; */
+    width: 28px; height: 28px; 
+    background-image: url('../images/letter_5.png'); 
+    background-size: cover; 
 }
 
 /* 기존 알림 닷 위치 조정 (편지 아이콘 우측 상단으로) */
@@ -95,8 +93,6 @@ body {
     margin-left: 0;
     border: 2px solid #FDF6E3; /* 아이콘과 겹칠 때 테두리 처리 */
 }
-
-/* --- (이하 .profile-icon, .dropdown-menu 등 기존 코드는 그대로 유지) --- */
 
 .profile-icon {
     width: 32px;
