@@ -59,10 +59,22 @@ if (sellTurnipBtn) {
 }    
     
     async function checkLoginStatus() {
+        const headerTitle = document.getElementById('headerTitle');
+
         try {
             const res = await fetch(`${BASE_URL}/users/me`, { credentials: "include" });
-            if (!res.ok && res.status === 401) {
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.role === 'admin') {
+                    if(headerTitle) headerTitle.textContent = '당신은 관리자 입니다.';
+                } else {
+                    if(headerTitle) headerTitle.textContent = '';
+                }
+            } else if (res.status === 401) {
+                // Not logged in
                 if(writeBtn) writeBtn.style.display = 'none';
+                // headerTitle remains default
             }
         } catch (e) {
             console.error("Login status check failed:", e);
@@ -118,7 +130,7 @@ if (sellTurnipBtn) {
             return [];
         }
     }
-    window.location.href = `chat.html?recipientId=${authorId}`;
+    
     
     // 게시글 렌더링 
     function renderPosts(posts) {
