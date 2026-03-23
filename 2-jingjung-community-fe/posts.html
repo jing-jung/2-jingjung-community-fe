@@ -10,6 +10,26 @@
 <body>
     <div id="header-placeholder"></div>
 
+    <button id="turnipBtn" class="turnip-floating-btn">
+        <img src="./images/radish_7.png" alt="무">
+    </button>
+
+    <div id="turnipModal" class="modal-overlay hidden">
+        <div class="turnip-modal-box">
+            <h3 class="turnip-title">무 주식 거래소</h3>
+            <p class="turnip-price">현재 시세: <strong id="currentTurnipPrice">105</strong> 벨</p>
+            <div class="turnip-input-group">
+                <input type="number" id="turnipQuantity" min="1" placeholder="수량 입력">
+                <span>개</span>
+            </div>
+            <div class="turnip-action-buttons">
+                <button id="buyTurnipBtn" class="turnip-btn buy">구매</button>
+                <button id="sellTurnipBtn" class="turnip-btn sell">판매</button>
+            </div>
+            <button id="closeTurnipModal" class="turnip-close-btn">닫기</button>
+        </div>
+    </div>
+
     <main class="container">
         <div class="intro-section">
             <p>안녕하세요,<br>아무 말 대잔치 <strong>게시판</strong> 입니다.</p>

@@ -8,11 +8,56 @@ document.addEventListener("DOMContentLoaded", () => {
     const writeBtn = document.getElementById("writeBtn");
     const loadingSentinel = document.getElementById("loadingSentinel");
     
-    // 헤더 프로필
-    // The header logic is now handled by js/header.js
-    // Only page-specific logic remains here.
+const turnipBtn = document.getElementById("turnipBtn");
+const turnipModal = document.getElementById("turnipModal");
+const closeTurnipModal = document.getElementById("closeTurnipModal");
+const buyTurnipBtn = document.getElementById("buyTurnipBtn");
+const sellTurnipBtn = document.getElementById("sellTurnipBtn");
+const turnipQuantity = document.getElementById("turnipQuantity");
 
-    // Check if user is logged in to show/hide write button
+if (turnipBtn) {
+    turnipBtn.addEventListener("click", () => {
+        turnipModal.classList.remove("hidden");
+        document.body.classList.add("no-scroll");
+    });
+}
+
+if (closeTurnipModal) {
+    closeTurnipModal.addEventListener("click", () => {
+        turnipModal.classList.add("hidden");
+        document.body.classList.remove("no-scroll");
+        turnipQuantity.value = "";
+    });
+}
+
+if (buyTurnipBtn) {
+    buyTurnipBtn.addEventListener("click", () => {
+        const qty = parseInt(turnipQuantity.value);
+        if (!qty || qty <= 0) {
+            alert("수량을 올바르게 입력해주세요.");
+            return;
+        }
+        alert(`${qty}개의 무를 구매했습니다!`);
+        turnipModal.classList.add("hidden");
+        document.body.classList.remove("no-scroll");
+        turnipQuantity.value = "";
+    });
+}
+
+if (sellTurnipBtn) {
+    sellTurnipBtn.addEventListener("click", () => {
+        const qty = parseInt(turnipQuantity.value);
+        if (!qty || qty <= 0) {
+            alert("수량을 올바르게 입력해주세요.");
+            return;
+        }
+        alert(`${qty}개의 무를 판매했습니다!`);
+        turnipModal.classList.add("hidden");
+        document.body.classList.remove("no-scroll");
+        turnipQuantity.value = "";
+    });
+}    
+    
     async function checkLoginStatus() {
         try {
             const res = await fetch(`${BASE_URL}/users/me`, { credentials: "include" });
