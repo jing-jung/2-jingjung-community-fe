@@ -14,6 +14,47 @@ document.addEventListener("DOMContentLoaded", () => {
     const sellTurnipBtn = document.getElementById("sellTurnipBtn");
     const turnipQuantity = document.getElementById("turnipQuantity");
 
+    const acModal = {
+    overlay: document.getElementById('ac-modal-overlay'),
+    message: document.getElementById('ac-modal-message'),
+    yesBtn: document.getElementById('ac-modal-yes'),
+    noBtn: document.getElementById('ac-modal-no'),
+    callback: null, // '예'를 눌렀을 때 실행할 함수를 저장할 변수
+
+    // 모달 열기 함수 (닉네임과 '예' 클릭 시 실행할 콜백 함수를 받음)
+    open: function(nickname, onConfirm) {
+        this.message.textContent = `${nickname}님에게 쪽지(1:1 채팅)를 보내시겠습니까?`;
+        this.callback = onConfirm; // 콜백 저장
+        this.overlay.classList.add('active');
+    },
+
+    // 모달 닫기 함수
+    close: function() {
+        this.overlay.classList.remove('active');
+        this.callback = null; // 콜백 초기화
+    },
+
+    // 초기화 함수 (이벤트 리스너 등록)
+    init: function() {
+        // '아니오' 버튼 클릭 시 닫기
+        this.noBtn.addEventListener('click', () => this.close());
+        // '예' 버튼 클릭 시 콜백 실행 후 닫기
+        this.yesBtn.addEventListener('click', () => {
+            if (this.callback) this.callback();
+            this.close();
+        });
+        // 배경(오버레이) 클릭 시에도 닫기
+        this.overlay.addEventListener('click', (e) => {
+            if (e.target === this.overlay) this.close();
+        });
+    }
+};
+
+// 페이지 로드 시 모달 초기화 실행
+document.addEventListener('DOMContentLoaded', () => {
+    acModal.init();
+});
+
     if (turnipBtn) {
         turnipBtn.addEventListener("click", () => {
             turnipModal.classList.remove("hidden");
@@ -125,7 +166,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const card = document.createElement("div");
             card.className = "post-card";
             
-            card.onclick = () => {
+            // 💡 1. 여기를 수정합니다. (e.target.closest로 프로필 클릭 시 무시하도록 처리)
+            card.onclick = (e) => {
+                // 클릭한 요소가 프로필 영역(.post-author)이라면 게시글 이동을 막습니다.
+                if (e.target.closest('.post-author')) return;
+                
                 window.location.href = `post_detail.html?id=${post.post_id}`;
             };
             
@@ -150,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <span class="date">${post.created_at}</span>
                     </div>
                 </div>
-                <div class="post-author">
+                <div class="post-author" style="cursor: pointer;" title="쪽지 보내기">
                     <div class="author-profile" 
                          style="background-image: url('${profileUrl}'); 
                                 background-size: cover; 
@@ -160,6 +205,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="author-name">${escapeHtml(post.author_nickname)}</span>
                 </div>
             `;
+            
+            // 💡 2. 프로필 클릭 이벤트를 새롭게 추가합니다.
+            const authorSection = card.querySelector('.post-author');
+            authorSection.addEventListener('click', (e) => {
+                e.stopPropagation(); // 상위로 클릭 이벤트 전파 방지
+                
+
+                acModal.open(post.author_nickname, () => {
+                    // 이 부분은 '예' 버튼을 눌렀을 때만 실행됩니다.
+                    // 실제 채팅 페이지 경로로 변경해 주세요. (예: chat.html?recipientId=...)
+                    window.location.href = `chat.html?recipientId=${post.user_id}`;
+                });
+            });
+
             postList.appendChild(card);
         });
     }
