@@ -25,6 +25,7 @@ const dummyBios = [
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
+    // 2. 내 프로필 불러오기 (여권)
     loadMyProfileDataForIntro();
 });
 
