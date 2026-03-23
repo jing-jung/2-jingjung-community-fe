@@ -1,80 +1,67 @@
 import { CONFIG } from './config.js';
 const BASE_URL = CONFIG.BASE_URL;
 
-import './header.js'; // Import the common header logic
 document.addEventListener("DOMContentLoaded", () => {
     // 1. 요소 가져오기
     const postList = document.getElementById("postList");
     const writeBtn = document.getElementById("writeBtn");
     const loadingSentinel = document.getElementById("loadingSentinel");
     
-const turnipBtn = document.getElementById("turnipBtn");
-const turnipModal = document.getElementById("turnipModal");
-const closeTurnipModal = document.getElementById("closeTurnipModal");
-const buyTurnipBtn = document.getElementById("buyTurnipBtn");
-const sellTurnipBtn = document.getElementById("sellTurnipBtn");
-const turnipQuantity = document.getElementById("turnipQuantity");
+    const turnipBtn = document.getElementById("turnipBtn");
+    const turnipModal = document.getElementById("turnipModal");
+    const closeTurnipModal = document.getElementById("closeTurnipModal");
+    const buyTurnipBtn = document.getElementById("buyTurnipBtn");
+    const sellTurnipBtn = document.getElementById("sellTurnipBtn");
+    const turnipQuantity = document.getElementById("turnipQuantity");
 
-if (turnipBtn) {
-    turnipBtn.addEventListener("click", () => {
-        turnipModal.classList.remove("hidden");
-        document.body.classList.add("no-scroll");
-    });
-}
+    if (turnipBtn) {
+        turnipBtn.addEventListener("click", () => {
+            turnipModal.classList.remove("hidden");
+            document.body.classList.add("no-scroll");
+        });
+    }
 
-if (closeTurnipModal) {
-    closeTurnipModal.addEventListener("click", () => {
-        turnipModal.classList.add("hidden");
-        document.body.classList.remove("no-scroll");
-        turnipQuantity.value = "";
-    });
-}
+    if (closeTurnipModal) {
+        closeTurnipModal.addEventListener("click", () => {
+            turnipModal.classList.add("hidden");
+            document.body.classList.remove("no-scroll");
+            turnipQuantity.value = "";
+        });
+    }
 
-if (buyTurnipBtn) {
-    buyTurnipBtn.addEventListener("click", () => {
-        const qty = parseInt(turnipQuantity.value);
-        if (!qty || qty <= 0) {
-            alert("수량을 올바르게 입력해주세요.");
-            return;
-        }
-        alert(`${qty}개의 무를 구매했습니다!`);
-        turnipModal.classList.add("hidden");
-        document.body.classList.remove("no-scroll");
-        turnipQuantity.value = "";
-    });
-}
+    if (buyTurnipBtn) {
+        buyTurnipBtn.addEventListener("click", () => {
+            const qty = parseInt(turnipQuantity.value);
+            if (!qty || qty <= 0) {
+                alert("수량을 올바르게 입력해주세요.");
+                return;
+            }
+            alert(`${qty}개의 무를 구매했습니다!`);
+            turnipModal.classList.add("hidden");
+            document.body.classList.remove("no-scroll");
+            turnipQuantity.value = "";
+        });
+    }
 
-if (sellTurnipBtn) {
-    sellTurnipBtn.addEventListener("click", () => {
-        const qty = parseInt(turnipQuantity.value);
-        if (!qty || qty <= 0) {
-            alert("수량을 올바르게 입력해주세요.");
-            return;
-        }
-        alert(`${qty}개의 무를 판매했습니다!`);
-        turnipModal.classList.add("hidden");
-        document.body.classList.remove("no-scroll");
-        turnipQuantity.value = "";
-    });
-}    
+    if (sellTurnipBtn) {
+        sellTurnipBtn.addEventListener("click", () => {
+            const qty = parseInt(turnipQuantity.value);
+            if (!qty || qty <= 0) {
+                alert("수량을 올바르게 입력해주세요.");
+                return;
+            }
+            alert(`${qty}개의 무를 판매했습니다!`);
+            turnipModal.classList.add("hidden");
+            document.body.classList.remove("no-scroll");
+            turnipQuantity.value = "";
+        });
+    }    
     
     async function checkLoginStatus() {
-        const headerTitle = document.getElementById('headerTitle');
-
         try {
             const res = await fetch(`${BASE_URL}/users/me`, { credentials: "include" });
-
-            if (res.ok) {
-                const data = await res.json();
-                if (data.role === 'admin') {
-                    if(headerTitle) headerTitle.textContent = '당신은 관리자 입니다.';
-                } else {
-                    if(headerTitle) headerTitle.textContent = '';
-                }
-            } else if (res.status === 401) {
-                // Not logged in
+            if (!res.ok && res.status === 401) {
                 if(writeBtn) writeBtn.style.display = 'none';
-                // headerTitle remains default
             }
         } catch (e) {
             console.error("Login status check failed:", e);
