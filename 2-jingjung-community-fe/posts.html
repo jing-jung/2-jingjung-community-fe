@@ -41,7 +41,18 @@
             </div>
 
         <div id="loadingSentinel" class="loading-sentinel">Loading...</div>
-    
+            <button id="mapBtn" class="map-floating-btn" title="마을 지도 보기">🗺️</button>
+
+        <div id="mapModal" class="modal-overlay hidden">
+        <div class="map-modal-box">
+            <h3 class="map-title">마을 전체 지도</h3>
+            <p class="map-desc">현재 접속 중인 이웃 주민들의 위치에구리!</p>        
+            <div class="map-container" id="mapContainer">
+        </div>
+        
+            <button id="closeMapModal" class="turnip-close-btn">닫기</button>
+        </div>
+    </div>
         <button id="trainBtn" class="train-floating-btn" title="기차표 예매">
         <img src="./images/move_24.png" alt="기차"> </button>
 

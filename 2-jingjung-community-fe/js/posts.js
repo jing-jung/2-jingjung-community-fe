@@ -279,4 +279,77 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.classList.remove("no-scroll");
         });
     }
+    const mapBtn = document.getElementById("mapBtn");
+const mapModal = document.getElementById("mapModal");
+const closeMapModal = document.getElementById("closeMapModal");
+const mapContainer = document.getElementById("mapContainer");
+
+async function renderMapPins() {
+    mapContainer.innerHTML = ""; 
+    
+    try {
+        const res = await fetch(`${BASE_URL}/users`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (res.ok) {
+            const users = await res.json(); 
+
+            users.forEach(user => {
+                const pin = document.createElement("div");
+                pin.className = "user-pin";
+                
+                const randomX = Math.random() * 90 + 5; 
+                const randomY = Math.random() * 85 + 7; 
+                
+                pin.style.left = `${randomX}%`;
+                pin.style.top = `${randomY}%`;
+                
+                let imgUrl = user.profile_image; 
+                if (imgUrl && !imgUrl.startsWith("http")) {
+                    imgUrl = BASE_URL + imgUrl;
+                }
+                
+                if (!imgUrl) {
+                    imgUrl = "./images/default-profile.png"; 
+                }
+
+                const userName = user.nickname || user.username || "이름 모를 주민";
+                
+                pin.innerHTML = `
+                    <img src="${imgUrl}" alt="${userName}" class="pin-image" onerror="this.src='./images/default-profile.png'">
+                    <span class="user-pin-name">${userName}</span>
+                `;
+                
+                pin.addEventListener("click", () => {
+                    alert(`${userName} 주민의 위치입니다구리!`);
+                });
+
+                mapContainer.appendChild(pin);
+            });
+        } else {
+            mapContainer.innerHTML = "<p style='margin-top: 50px; color: #888;'>주민 목록을 불러올 수 없습니다구리.<br>(백엔드 API 확인 필요)</p>";
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+if (mapBtn) {
+    mapBtn.addEventListener("click", () => {
+        renderMapPins(); 
+        mapModal.classList.remove("hidden");
+        document.body.classList.add("no-scroll");
+    });
+}
+
+if (closeMapModal) {
+    closeMapModal.addEventListener("click", () => {
+        mapModal.classList.add("hidden");
+        document.body.classList.remove("no-scroll");
+    });
+}
 });
