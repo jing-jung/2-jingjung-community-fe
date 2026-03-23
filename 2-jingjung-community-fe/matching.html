@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>운명의 이웃 찾기</title>
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/matching.css">
+</head>
+<body>
+    <header class="header">
+        <a href="posts.html" class="header-back-btn">&lt;</a>
+        <div class="header-right-actions">
+            <div class="bell-container">
+                <div class="bell-icon">💰</div>
+                <span class="bell-amount">2,000</span>
+            </div>
+            <div class="message-icon-wrapper" id="headerMessageBtn">
+                <div class="message-icon">✉️</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="matching-container">
+        <div id="introSection" class="matching-box intro-me-box">
+            <h3 class="dating-title">내 이웃 여권 꾸미기</h3>
+            
+            <div class="intro-my-profile">
+                <img src="./images/default-profile.png" alt="내 프로필" id="introMyImage" class="intro-my-image" onerror="this.src='./images/default-profile.png'">
+                <h4 id="introMyName" class="intro-my-name">로딩 중...</h4>
+            </div>
+            
+            <div class="intro-input-group">
+                <label for="introMyBio">자유롭게 소개글을 작성하세요구리!</label>
+                <textarea id="introMyBio" rows="4" placeholder="예) 취미는 낚시고, 사과를 제일 좋아해구리!"></textarea>
+            </div>
+            
+            <button id="submitBioBtn" class="dating-btn-submit">소개글 작성 완료구리!</button>
+        </div>
+
+        <div id="datingSection" class="matching-box matching-card-box hidden">
+            <h3 class="dating-title">이웃 매칭 중구리!</h3>
+            
+            <div class="dating-card" id="datingCard">
+                <img src="" alt="주민 사진" id="datingImage" class="dating-image" onerror="this.src='./images/default-profile.png'">
+                <div class="dating-info">
+                    <h4 id="datingName"></h4>
+                    <p id="datingDesc"></p>
+                </div>
+            </div>
+            
+            <div class="dating-action-buttons">
+                <button id="btnHate" class="dating-btn btn-x">❌</button>
+                <button id="btnLike" class="dating-btn btn-o">⭕</button>
+            </div>
+            
+            <button id="exitMatchingBtn" class="turnip-close-btn">그만하기</button>
+        </div>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/matching.js"></script>
+</body>
+</html>

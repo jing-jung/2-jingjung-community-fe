@@ -1,0 +1,209 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Suit', sans-serif;
+}
+
+body {
+    background-color: #FDF6E3;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 100px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.matching-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.matching-box {
+    background-color: #fff;
+    border: 6px solid #FF9A9E;
+    padding: 30px 25px;
+    border-radius: 25px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    animation: popIn 0.3s ease-out;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.intro-me-box {
+    border-color: #78C484;
+}
+
+.dating-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #FF7E7E;
+    margin-bottom: 25px;
+}
+
+.intro-me-box .dating-title {
+    color: #78C484;
+}
+
+.intro-my-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    border-bottom: 2px dashed #E6D5B8;
+    padding-bottom: 25px;
+}
+
+.intro-my-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #78C484;
+    object-fit: cover;
+}
+
+.intro-my-name {
+    font-size: 22px;
+    font-weight: 800;
+    color: #795548;
+}
+
+.intro-input-group {
+    text-align: left;
+    margin-bottom: 30px;
+}
+
+.intro-input-group label {
+    display: block;
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.intro-input-group textarea {
+    width: 100%;
+    border: 2px solid #E6D5B8;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 16px;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    background-color: #FDF6E3;
+}
+
+.intro-input-group textarea:focus {
+    border-color: #78C484;
+}
+
+.dating-btn-submit {
+    width: 100%;
+    padding: 18px;
+    background-color: #78C484;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(120, 196, 132, 0.4);
+    transition: all 0.2s;
+}
+
+.dating-btn-submit:hover {
+    background-color: #5EAB6B;
+    transform: translateY(-2px);
+}
+
+.dating-card {
+    background-color: #FDF6E3;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 2px solid #E6D5B8;
+    margin-bottom: 25px;
+}
+
+.dating-image {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    border-bottom: 2px solid #E6D5B8;
+}
+
+.dating-info {
+    padding: 20px;
+}
+
+.dating-info h4 {
+    font-size: 22px;
+    color: #795548;
+    margin-bottom: 10px;
+}
+
+.dating-info p {
+    font-size: 16px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.dating-action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.dating-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: none;
+    font-size: 35px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dating-btn:hover {
+    transform: scale(1.1);
+}
+
+.btn-x {
+    background-color: #fff;
+    border: 3px solid #FF5A5A;
+    color: #FF5A5A;
+}
+
+.btn-o {
+    background-color: #fff;
+    border: 3px solid #78C484;
+    color: #78C484;
+}
+
+.turnip-close-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-top: 10px;
+}

@@ -352,4 +352,12 @@ if (closeMapModal) {
         document.body.classList.remove("no-scroll");
     });
 }
+
+const datingBannerBtn = document.getElementById("datingBannerBtn");
+
+if (datingBannerBtn) {
+    datingBannerBtn.addEventListener("click", () => {
+        window.location.href = "matching.html";
+    });
+}
 });
