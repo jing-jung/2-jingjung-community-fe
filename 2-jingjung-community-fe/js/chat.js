@@ -5,13 +5,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const API_BASE_URL = `http://${CONFIG.BASE_URL}`;
     const WS_BASE_URL = `ws://${CONFIG.BASE_URL}`;
 
-    // Get session_id from localStorage for WebSocket token parameter
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-        window.location.href = 'login.html';
-        return;
-    }
-
     let currentUserId;
     try {
         const meResponse = await fetch(`${API_BASE_URL}/users/me`, { credentials: "include" });
@@ -21,7 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {
         console.error(e);
         alert('사용자 정보를 가져오는데 실패했습니다.');
-        localStorage.removeItem('access_token');
         window.location.href = 'login.html';
         return;
     }
@@ -40,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let websocket;
 
     const setupWebSocket = (currentChatId) => {
-        const wsUrl = `${WS_BASE_URL}/ws/${currentChatId}?token=${token}`;
+        const wsUrl = `${WS_BASE_URL}/ws/${currentChatId}`;
         websocket = new WebSocket(wsUrl);
 
         websocket.onopen = () => console.log('WebSocket connection established');

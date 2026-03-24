@@ -139,7 +139,6 @@ function initializeHeader() {
                 });
                 if(response.ok) {
                     alert('로그아웃 되었습니다.');
-                    localStorage.removeItem('access_token');
                     window.location.href = 'login.html';
                 } else {
                     alert('로그아웃에 실패했습니다.');

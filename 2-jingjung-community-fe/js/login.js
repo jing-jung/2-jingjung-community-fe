@@ -75,8 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('access_token', data.session_id);
                 alert("로그인 성공! 게시글 목록 페이지로 이동합니다.");
                 window.location.href = "posts.html";
             } else {
