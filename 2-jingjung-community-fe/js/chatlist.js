@@ -1,5 +1,6 @@
 import { CONFIG } from './config.js';
-import './header.js'; 
+const BASE_URL = CONFIG.BASE_URL;
+import './header.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const API_BASE_URL = `http://${CONFIG.BASE_URL}`;

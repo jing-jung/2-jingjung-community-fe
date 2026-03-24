@@ -1,5 +1,6 @@
 import { CONFIG } from './config.js';
 const BASE_URL = CONFIG.BASE_URL;
+import './header.js';
 
 const introSection = document.getElementById("introSection");
 const datingSection = document.getElementById("datingSection");

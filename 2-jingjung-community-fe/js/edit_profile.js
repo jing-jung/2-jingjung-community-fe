@@ -1,7 +1,7 @@
 import { CONFIG } from './config.js';
 const BASE_URL = CONFIG.BASE_URL;
+import './header.js';
 
-import './header.js'; // Import the common header logic
 document.addEventListener("DOMContentLoaded", () => {
     const nicknameInput = document.getElementById("nickname");
     const nicknameError = document.getElementById("nicknameError");

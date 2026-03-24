@@ -1,5 +1,6 @@
 import { CONFIG } from './config.js';
 const BASE_URL = CONFIG.BASE_URL; 
+
 document.addEventListener("DOMContentLoaded", () => {
     fetch(`${BASE_URL}/users/me`, { credentials: "include" })
         .then(res => {
