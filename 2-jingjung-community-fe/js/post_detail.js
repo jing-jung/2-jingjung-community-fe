@@ -1,5 +1,7 @@
-const BASE_URL = CONFIG.BASE_URL; 
+import { CONFIG } from './config.js';
 import './header.js'; // Import the common header logic
+
+const BASE_URL = CONFIG.BASE_URL; 
 
 document.addEventListener("DOMContentLoaded", async () => {    // 1. 요소 가져오기
     const backBtn = document.getElementById("backBtn");
@@ -88,20 +90,13 @@ document.addEventListener("DOMContentLoaded", async () => {    // 1. 요소 가�
                 throw new Error("게시글 로딩 실패: " + response.status);
             }
 
-            const data = await response.json();
-            const post = data.post; // 응답이 { "post": { ... } } 형태일 것으로 예상
-
-            if (!post) {
-                // 혹시 모르니 단일 객체로 오는 경우도 처리
-                if (data.post_id) {
-                    await renderPost(data);
-                } else {
-                    throw new Error("API 응답에서 'post' 객체를 찾을 수 없습니다.");
-                }
-            } else {
-                await renderPost(post);
-            }
+            const postData = await response.json();
             
+            if (!postData || !postData.post_id) {
+                throw new Error("잘못된 게시글 데이터입니다.");
+            }
+
+            await renderPost(postData);
             loadComments();
 
         } catch (error) {
