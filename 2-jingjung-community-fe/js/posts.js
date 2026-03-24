@@ -13,6 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const buyTurnipBtn = document.getElementById("buyTurnipBtn");
     const sellTurnipBtn = document.getElementById("sellTurnipBtn");
     const turnipQuantity = document.getElementById("turnipQuantity");
+    const myTurnipCountElem = document.getElementById("myTurnipCount");
+    const currentTurnipPriceElem = document.getElementById("currentTurnipPrice");
+
+    let currentPrice = 0;
 
     const acModal = {
         overlay: document.getElementById('ac-modal-overlay'),
@@ -24,7 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
         open: function(nickname, onConfirm) {
             this.message.textContent = `${nickname}님에게 쪽지(1:1 채팅)를 보내시겠습니까?`;
             this.callback = onConfirm;
-            // HTML 구조에 맞춰 'hidden' 클래스를 제거하여 표시
             this.overlay.classList.add('active'); 
             this.overlay.style.display = 'flex'; 
         },
@@ -36,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
         },
 
         init: function() {
-            // 버튼 이벤트 연결
             this.noBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -56,11 +58,67 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 };
 
-// 페이지 로드 시 모달 초기화 실행
 acModal.init();
 
+    async function updateTurnipPrice() {
+        try {
+            const res = await fetch(`${BASE_URL}/turnips/price`);
+            if (res.ok) {
+                const data = await res.json();
+                currentPrice = data.current_price;
+                currentTurnipPriceElem.textContent = currentPrice;
+            } else {
+                currentTurnipPriceElem.textContent = "??";
+            }
+        } catch (e) {
+            console.error("Error fetching turnip price:", e);
+            currentTurnipPriceElem.textContent = "??";
+        }
+    }
+
+    async function tradeTurnips(type, quantity) {
+        if (currentPrice <= 0) {
+            alert("시세 정보를 가져올 수 없습니다. 잠시 후 다시 시도해주세요.");
+            return;
+        }
+        try {
+            const res = await fetch(`${BASE_URL}/turnips/trade`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ type, quantity, price: currentPrice }),
+                credentials: "include"
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message);
+                myTurnipCountElem.textContent = data.turnip_amount || 0;
+                if(window.updateHeader) {
+                    window.updateHeader();
+                }
+            } else {
+                alert(data.detail || "거래에 실패했습니다.");
+            }
+        } catch (e) {
+            console.error("Error trading turnips:", e);
+            alert("거래 중 오류가 발생했습니다.");
+        }
+    }
+
     if (turnipBtn) {
-        turnipBtn.addEventListener("click", () => {
+        turnipBtn.addEventListener("click", async () => {
+            await updateTurnipPrice(); // 시세 먼저 업데이트
+            try {
+                const res = await fetch(`${BASE_URL}/users/me`, { credentials: "include" });
+                if (res.ok) {
+                    const data = await res.json();
+                    myTurnipCountElem.textContent = data.turnip || 0;
+                } else {
+                    myTurnipCountElem.textContent = "??";
+                }
+            } catch (e) {
+                myTurnipCountElem.textContent = "??";
+            }
+            
             turnipModal.classList.remove("hidden");
             document.body.classList.add("no-scroll");
         });
@@ -81,9 +139,7 @@ acModal.init();
                 alert("수량을 올바르게 입력해주세요.");
                 return;
             }
-            alert(`${qty}개의 무를 구매했습니다!`);
-            turnipModal.classList.add("hidden");
-            document.body.classList.remove("no-scroll");
+            tradeTurnips("buy", qty);
             turnipQuantity.value = "";
         });
     }
@@ -95,9 +151,7 @@ acModal.init();
                 alert("수량을 올바르게 입력해주세요.");
                 return;
             }
-            alert(`${qty}개의 무를 판매했습니다!`);
-            turnipModal.classList.add("hidden");
-            document.body.classList.remove("no-scroll");
+            tradeTurnips("sell", qty);
             turnipQuantity.value = "";
         });
     }    
@@ -115,10 +169,8 @@ acModal.init();
     }
     checkLoginStatus();
 
-    // 2. 게시글 작성 버튼
     if (writeBtn) {
         writeBtn.addEventListener("click", () => {
-            // Check if user is logged in before redirecting
             fetch(`${BASE_URL}/users/me`, { credentials: "include" })
                 .then(res => {
                     if (res.ok) {
@@ -135,7 +187,6 @@ acModal.init();
         });
     }
 
-    // 3. 게시글 목록 로직 (인피니티 스크롤)
     function escapeHtml(text) {
     if (!text) return "";
     return text
@@ -163,16 +214,12 @@ acModal.init();
         }
     }
     
-    
-    // 게시글 렌더링 
     function renderPosts(posts) {
         posts.forEach(post => {
             const card = document.createElement("div");
             card.className = "post-card";
             
-            // 💡 1. 여기를 수정합니다. (e.target.closest로 프로필 클릭 시 무시하도록 처리)
             card.onclick = (e) => {
-                // 클릭한 요소가 프로필 영역(.post-author)이라면 게시글 이동을 막습니다.
                 if (e.target.closest('.post-author')) return;
                 
                 window.location.href = `post_detail.html?id=${post.post_id}`;
@@ -183,7 +230,6 @@ acModal.init();
                 profileUrl = BASE_URL + profileUrl;
             }
 
-            // 숫자 포맷 (1k, 10k 등)
             const formatNumber = (num) => {
                 if (num >= 1000) return Math.floor(num / 1000) + "k";
                 return num;
@@ -210,7 +256,6 @@ acModal.init();
                 </div>
             `;
             
-            // 💡 2. 프로필 클릭 이벤트를 새롭게 추가합니다.
             const authorSection = card.querySelector('.post-author');
             authorSection.addEventListener('click', (e) => {
                 e.stopPropagation(); 
@@ -223,7 +268,6 @@ acModal.init();
         });
     }
 
-    // Intersection Observer (스크롤 감지)
     const observer = new IntersectionObserver(async (entries) => {
         const entry = entries[0];
         
@@ -254,9 +298,6 @@ acModal.init();
             currentOffset += newPosts.length;
         })();
     }
-    // =========================================
-    // 기차표 & 대기열 시스템 로직 (추가)
-    // =========================================
     const trainBtn = document.getElementById("trainBtn");
     const trainModal = document.getElementById("trainModal");
     const closeTrainModal = document.getElementById("closeTrainModal");
@@ -265,21 +306,17 @@ acModal.init();
     const queueModal = document.getElementById("queueModal");
     const queueNumberSpan = document.getElementById("queueNumber");
 
-    // 1. 시간표 자동 생성 함수 (현재 시간 기준으로 마감 처리)
     function renderTimetable() {
         timetableList.innerHTML = "";
         const now = new Date();
         const currentHour = now.getHours();
 
-        // 아침 9시부터 밤 10시(22시)까지 기차가 있다고 가정
         for (let i = 9; i <= 22; i++) {
             const row = document.createElement("div");
-            // i(출발시간)가 현재 시간보다 작거나 같으면 마감(past)
             const isPast = i <= currentHour; 
             
             row.className = `timetable-row ${isPast ? 'past' : ''}`;
             
-            // 시간 포맷 (예: 9 -> 09:00)
             const timeString = `${i < 10 ? '0'+i : i}:00 출발`;
             
             row.innerHTML = `
@@ -287,7 +324,6 @@ acModal.init();
                 <button class="reserve-btn">${isPast ? '마감' : '예매'}</button>
             `;
 
-            // 예매 가능한 버튼에만 클릭 이벤트 추가
             if (!isPast) {
                 const btn = row.querySelector('.reserve-btn');
                 btn.addEventListener("click", () => {
@@ -298,40 +334,35 @@ acModal.init();
         }
     }
 
-    // 2. KTX 대기열 시작 로직
     function startReservationQueue() {
-        trainModal.classList.add("hidden"); // 시간표 닫기
-        queueModal.classList.remove("hidden"); // 대기열 창 띄우기
+        trainModal.classList.add("hidden"); 
+        queueModal.classList.remove("hidden"); 
         
-        // 50명 ~ 250명 사이의 가짜 대기자 수 생성
         let waitNumber = Math.floor(Math.random() * 200) + 50; 
         queueNumberSpan.textContent = waitNumber;
 
-        // 0.4초마다 대기자 숫자가 무작위로 줄어드는 애니메이션
         const interval = setInterval(() => {
             waitNumber -= Math.floor(Math.random() * 10) + 5; 
             
             if (waitNumber <= 0) {
-                clearInterval(interval); // 타이머 종료
-                queueModal.classList.add("hidden"); // 대기열 닫기
+                clearInterval(interval); 
+                queueModal.classList.add("hidden"); 
                 alert("기차표 예매가 완료되었습니다구리! 즐거운 여행 되세요! ✈️");
                 document.body.classList.remove("no-scroll");
             } else {
-                queueNumberSpan.textContent = waitNumber; // 화면 숫자 업데이트
+                queueNumberSpan.textContent = waitNumber; 
             }
         }, 400); 
     }
 
-    // 3. 기차 버튼 클릭 시 모달 열기
     if (trainBtn) {
         trainBtn.addEventListener("click", () => {
-            renderTimetable(); // 모달 열 때마다 시간표 새로 계산
+            renderTimetable(); 
             trainModal.classList.remove("hidden");
             document.body.classList.add("no-scroll");
         });
     }
 
-    // 4. 시간표 닫기 버튼
     if (closeTrainModal) {
         closeTrainModal.addEventListener("click", () => {
             trainModal.classList.add("hidden");

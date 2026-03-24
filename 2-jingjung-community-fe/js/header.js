@@ -23,17 +23,82 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+async function loadMyProfile() {
+    const headerProfileIcon = document.getElementById('headerProfileIcon');
+    const bellAmountSpan = document.querySelector('.bell-amount');
+
+    try {
+        const res = await fetch(`${BASE_URL}/users/me`, { credentials: "include" });
+        if (res.ok) {
+            const user = await res.json();
+            
+            if (user.profile_image && headerProfileIcon) {
+                let imgUrl = user.profile_image;
+                if (!imgUrl.startsWith("http")) imgUrl = BASE_URL + imgUrl;
+                
+                headerProfileIcon.style.backgroundImage = `url('${imgUrl}')`;
+                headerProfileIcon.style.backgroundSize = "cover";
+                headerProfileIcon.style.backgroundColor = "transparent"; 
+            }
+
+            if (bellAmountSpan && typeof user.bell !== 'undefined') {
+                bellAmountSpan.textContent = user.bell.toLocaleString();
+            }
+
+            const headerTitle = document.getElementById('headerTitle');
+            if (headerTitle && (window.location.pathname.endsWith('/posts.html') || window.location.pathname === '/')) {
+                if (user.is_admin === true || user.role === 'admin') { 
+                    headerTitle.textContent = "당신은 관리자 입니다.";
+                    headerTitle.style.display = 'block';
+                } else {
+                    headerTitle.textContent = "";  
+                }
+            }
+
+        } else if (res.status === 401) {
+            if (bellAmountSpan) bellAmountSpan.textContent = '???';
+            console.log("User not authenticated for header profile.");
+        }
+    } catch (e) {
+        if (bellAmountSpan) bellAmountSpan.textContent = '???';
+        console.error("내 정보 로딩 실패:", e);
+    }
+}
+
+async function checkUnreadMessages() {
+    const chatNotificationDot = document.getElementById("chat-notification-dot");
+    try {
+        const res = await fetch(`${BASE_URL}/chats`, { credentials: "include" });
+        if (res.ok) {
+            const data = await res.json();
+            const totalUnread = data.chats.reduce((sum, chat) => sum + chat.unread_count, 0);
+            if (totalUnread > 0) {
+                chatNotificationDot.classList.remove("hidden");
+            } else {
+                chatNotificationDot.classList.add("hidden");
+            }
+        } else if (res.status === 401) {
+            chatNotificationDot.classList.add("hidden");
+        }
+    } catch (e) {
+        console.error("안읽은 메시지 확인 실패:", e);
+    }
+}
+
+// 다른 스크립트에서 헤더 정보를 업데이트할 수 있도록 window 객체에 함수를 할당합니다.
+window.updateHeader = () => {
+    loadMyProfile();
+    checkUnreadMessages();
+};
+
 function initializeHeader() {
     const headerBackBtn = document.getElementById('headerBackBtn');
     const headerTitle = document.getElementById('headerTitle');
     const headerProfileIcon = document.getElementById('headerProfileIcon');
     const headerDropdown = document.getElementById('headerDropdown');
     const logoutBtn = document.getElementById('logoutBtn');
-    const chatNotificationDot = document.getElementById("chat-notification-dot");
-    const headerMessageBtn = document.getElementById('headerMessageBtn'); // 새로 추가된 부분
+    const headerMessageBtn = document.getElementById('headerMessageBtn');
 
-
-    // Conditional display for header title/back button
     if (window.location.pathname.endsWith('/posts.html') || window.location.pathname === '/') {
         if (headerTitle) headerTitle.style.display = 'block';
         if (headerBackBtn) headerBackBtn.style.display = 'none';
@@ -49,75 +114,14 @@ function initializeHeader() {
         });
     }
 
-    // 편지 아이콘 클릭 시 채팅 목록 페이지로 이동
     if (headerMessageBtn) {
         headerMessageBtn.addEventListener('click', () => {
             window.location.href = 'chatlist.html';
         });
     }
 
-    async function loadMyProfile() {
-        try {
-            const res = await fetch(`${BASE_URL}/users/me`, { credentials: "include" });
-            if (res.ok) {
-                const user = await res.json();
-                
-                // 1. 기존 프로필 이미지 처리 로직
-                if (user.profile_image && headerProfileIcon) {
-                    let imgUrl = user.profile_image;
-                    if (!imgUrl.startsWith("http")) imgUrl = BASE_URL + imgUrl;
-                    
-                    headerProfileIcon.style.backgroundImage = `url('${imgUrl}')`;
-                    headerProfileIcon.style.backgroundSize = "cover";
-                    headerProfileIcon.style.backgroundColor = "transparent"; 
-                }
-
-                // 2. [추가된 부분] 관리자 여부에 따른 헤더 타이틀 변경
-                const headerTitle = document.getElementById('headerTitle');
-                // 현재 페이지가 posts.html일 때만 텍스트 변경 적용
-                if (headerTitle && (window.location.pathname.endsWith('/posts.html') || window.location.pathname === '/')) {
-                    
-                    // 주의: 백엔드에서 user.is_admin 이나 user.role 값을 보내준다고 가정한 코드입니다.
-                    // 만약 아직 백엔드에 관리자 구분 필드가 없다면, 
-                    // 임시로 특정 이메일을 지정해서 테스트해 볼 수 있습니다. (예: user.email === 'admin@gmail.com')
-                    if (user.is_admin === true || user.role === 'admin') { 
-                        headerTitle.textContent = "당신은 관리자 입니다.";
-                        headerTitle.style.display = 'block';
-                    } else {
-                        // 일반 유저는 아무것도 안 뜨게 텍스트를 비우거나 요소를 숨김
-                        headerTitle.textContent = "";  
-                    }
-                }
-
-            } else if (res.status === 401) {
-                console.log("User not authenticated for header profile.");
-            }
-        } catch (e) {
-            console.error("내 정보 로딩 실패:", e);
-        }
-    }
-    
-    async function checkUnreadMessages() {
-        try {
-            const res = await fetch(`${BASE_URL}/chats`, { credentials: "include" });
-            if (res.ok) {
-                const data = await res.json();
-                const totalUnread = data.chats.reduce((sum, chat) => sum + chat.unread_count, 0);
-                if (totalUnread > 0) {
-                    chatNotificationDot.classList.remove("hidden");
-                } else {
-                    chatNotificationDot.classList.add("hidden");
-                }
-            } else if (res.status === 401) {
-                chatNotificationDot.classList.add("hidden");
-            }
-        } catch (e) {
-            console.error("안읽은 메시지 확인 실패:", e);
-        }
-    }
-
-    loadMyProfile(); 
-    checkUnreadMessages();
+    // 초기 헤더 정보 로드
+    window.updateHeader();
 
     if (headerProfileIcon && headerDropdown) {
         headerProfileIcon.addEventListener('click', (event) => {
