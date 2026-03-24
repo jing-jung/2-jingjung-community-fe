@@ -15,45 +15,49 @@ document.addEventListener("DOMContentLoaded", () => {
     const turnipQuantity = document.getElementById("turnipQuantity");
 
     const acModal = {
-    overlay: document.getElementById('ac-modal-overlay'),
-    message: document.getElementById('ac-modal-message'),
-    yesBtn: document.getElementById('ac-modal-yes'),
-    noBtn: document.getElementById('ac-modal-no'),
-    callback: null, // '예'를 눌렀을 때 실행할 함수를 저장할 변수
+        overlay: document.getElementById('ac-modal-overlay'),
+        message: document.getElementById('ac-modal-message'),
+        yesBtn: document.getElementById('ac-modal-yes'),
+        noBtn: document.getElementById('ac-modal-no'),
+        callback: null,
 
-    // 모달 열기 함수 (닉네임과 '예' 클릭 시 실행할 콜백 함수를 받음)
-    open: function(nickname, onConfirm) {
-        this.message.textContent = `${nickname}님에게 쪽지(1:1 채팅)를 보내시겠습니까?`;
-        this.callback = onConfirm; // 콜백 저장
-        this.overlay.classList.add('active');
-    },
+        open: function(nickname, onConfirm) {
+            this.message.textContent = `${nickname}님에게 쪽지(1:1 채팅)를 보내시겠습니까?`;
+            this.callback = onConfirm;
+            // HTML 구조에 맞춰 'hidden' 클래스를 제거하여 표시
+            this.overlay.classList.add('active'); 
+            this.overlay.style.display = 'flex'; 
+        },
 
-    // 모달 닫기 함수
-    close: function() {
-        this.overlay.classList.remove('active');
-        this.callback = null; // 콜백 초기화
-    },
+        close: function() {
+            this.overlay.classList.remove('active');
+            this.overlay.style.display = 'none';
+            this.callback = null;
+        },
 
-    // 초기화 함수 (이벤트 리스너 등록)
-    init: function() {
-        // '아니오' 버튼 클릭 시 닫기
-        this.noBtn.addEventListener('click', () => this.close());
-        // '예' 버튼 클릭 시 콜백 실행 후 닫기
-        this.yesBtn.addEventListener('click', () => {
-            if (this.callback) this.callback();
-            this.close();
-        });
-        // 배경(오버레이) 클릭 시에도 닫기
-        this.overlay.addEventListener('click', (e) => {
-            if (e.target === this.overlay) this.close();
+        init: function() {
+            // 버튼 이벤트 연결
+            this.noBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.close();
+            });
+
+            this.yesBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (this.callback) this.callback();
+                this.close();
+            });
+
+            this.overlay.addEventListener('click', (e) => {
+                if (e.target === this.overlay) this.close();
         });
     }
 };
 
 // 페이지 로드 시 모달 초기화 실행
-document.addEventListener('DOMContentLoaded', () => {
-    acModal.init();
-});
+acModal.init();
 
     if (turnipBtn) {
         turnipBtn.addEventListener("click", () => {
@@ -209,12 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // 💡 2. 프로필 클릭 이벤트를 새롭게 추가합니다.
             const authorSection = card.querySelector('.post-author');
             authorSection.addEventListener('click', (e) => {
-                e.stopPropagation(); // 상위로 클릭 이벤트 전파 방지
-                
-
+                e.stopPropagation(); 
                 acModal.open(post.author_nickname, () => {
-                    // 이 부분은 '예' 버튼을 눌렀을 때만 실행됩니다.
-                    // 실제 채팅 페이지 경로로 변경해 주세요. (예: chat.html?recipientId=...)
                     window.location.href = `chat.html?recipientId=${post.user_id}`;
                 });
             });

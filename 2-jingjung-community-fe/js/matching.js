@@ -19,16 +19,7 @@ const exitMatchingBtn = document.getElementById("exitMatchingBtn");
 let matchingUsers = [];
 let currentUserIndex = 0;
 
-const dummyBios = [
-    "사과 먹고 싶어구리! 취미는 곤충 채집!",
-    "오늘 날씨 최고구리! 나랑 낚시하러 갈래?",
-    "꽃에 물 주는 거 좋아해구리! 상냥한 이웃을 찾아요!",
-    "헬스보이! 나랑 운동할 이웃 어디 없나구리?",
-    "별똥별 보고 싶어구리! 로맨틱한 이웃을 찾아요!"
-];
-
 document.addEventListener("DOMContentLoaded", () => {
-    // 2. 내 프로필 불러오기 
     loadMyProfileDataForIntro();
 });
 
@@ -36,33 +27,62 @@ async function loadMyProfileDataForIntro() {
     introMyName.textContent = "로딩 중...";
     try {
         const res = await fetch(`${BASE_URL}/users/me`, { credentials: "include" });
-        if (res.ok) {
-            const user = await res.json();
-            
-            if (user.profile_image) {
-                let imgUrl = user.profile_image;
-                if (!imgUrl.startsWith("http")) imgUrl = BASE_URL + imgUrl;
-                introMyImage.src = imgUrl;
+
+        if (!res.ok) {
+            if (res.status === 401) {
+                alert("매칭을 이용하려면 로그인이 필요합니다.");
+                window.location.href = "login.html";
             } else {
-                introMyImage.src = "./images/radish_7.png";
+                throw new Error("사용자 정보를 불러오는 데 실패했습니다.");
             }
-            
-            introMyName.textContent = user.nickname || user.username || "이름 모를 주민";
-        } else {
-            introMyName.textContent = "정보를 불러올 수 없습니다";
-            introMyImage.src = "./images/radish_7.png";
+            return;
         }
+
+        const user = await res.json();
+
+        // 사용자가 이미 자기소개를 작성했는지 확인
+        if (user.bio && user.bio.trim().length >= 5) {
+            // 작성했다면 바로 매칭 화면으로 전환
+            switchToDatingSection();
+            return; 
+        }
+
+        // --- 자기소개 작성이 필요한 경우 ---
+        // 자기소개 섹션을 보여주고, 매칭 섹션은 숨김
+        introSection.classList.remove("hidden");
+        datingSection.classList.add("hidden");
+
+        // 사용자 정보(프로필 사진, 닉네임)를 자기소개 섹션에 채워넣기
+        if (user.profile_image) {
+            let imgUrl = user.profile_image;
+            if (!imgUrl.startsWith("http")) imgUrl = BASE_URL + imgUrl;
+            introMyImage.src = imgUrl;
+        } else {
+            introMyImage.src = "./images/radish_7.png"; // 기본 이미지
+        }
+        
+        introMyName.textContent = user.nickname || user.username || "이름 모를 주민";
+        
     } catch (error) {
+        console.error("Error loading profile data:", error);
         introMyName.textContent = "에러구리!";
         introMyImage.src = "./images/radish_7.png";
+        alert("데이터를 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
+}
+
+function switchToDatingSection() {
+    introSection.classList.add("hidden");
+    datingSection.classList.remove("hidden");
+    loadMatchingUsers();
 }
 
 async function loadMatchingUsers() {
     try {
         const res = await fetch(`${BASE_URL}/users`, {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json" },
+            credentials: "include" 
         });
 
         if (res.ok) {
@@ -71,11 +91,12 @@ async function loadMatchingUsers() {
             showNextUser();
         }
     } catch (error) {
+        console.error("매칭 유저 로드 실패:", error);
     }
 }
 
 function showNextUser() {
-    if (currentUserIndex >= matchingUsers.length) {
+    if (!matchingUsers || matchingUsers.length === 0 || currentUserIndex >= matchingUsers.length) {
         datingImage.src = "./images/radish_7.png";
         datingName.textContent = "끝!";
         datingDesc.textContent = "더 이상 추천할 이웃이 없습니다구리.";
@@ -95,32 +116,45 @@ function showNextUser() {
 
     datingImage.src = imgUrl;
     datingName.textContent = user.nickname || user.username || "이름 모를 주민";
-    
-    const randomBio = dummyBios[Math.floor(Math.random() * dummyBios.length)];
-    datingDesc.textContent = randomBio;
+    datingDesc.textContent = user.bio || "소개글이 아직 없습니다.";
 }
 
 if (submitBioBtn) {
-    submitBioBtn.addEventListener("click", () => {
+    submitBioBtn.addEventListener("click", async () => {
         const bioText = introMyBio.value;
         if (bioText.length < 5) {
             alert("소개글을 조금 더 성의 있게 작성하세요구리! (5자 이상)");
             return;
         }
-        
-        introSection.classList.add("hidden");
-        datingSection.classList.remove("hidden");
-        loadMatchingUsers();
+
+        try {
+            const res = await fetch(`${BASE_URL}/users/me/bio`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ bio: bioText })
+            });
+
+            if (res.ok) {
+                switchToDatingSection();
+            } else {
+                alert("소개글 저장에 실패했습니다구리.");
+            }
+        } catch (error) {
+            console.error("소개글 저장 중 에러 발생:", error);
+        }
     });
 }
 
 if (btnLike) {
     btnLike.addEventListener("click", () => {
-        const likedUser = matchingUsers[currentUserIndex];
-        const userName = likedUser.nickname || likedUser.username || "이웃";
-        alert(`${userName}님에게 내 프로필과 사진을 보냈습니다!`);
-        currentUserIndex++;
-        showNextUser();
+        if (matchingUsers[currentUserIndex]) {
+            const likedUser = matchingUsers[currentUserIndex];
+            const userName = likedUser.nickname || likedUser.username || "이웃";
+            alert(`${userName}님에게 내 프로필과 사진을 보냈습니다!`);
+            currentUserIndex++;
+            showNextUser();
+        }
     });
 }
 
@@ -135,4 +169,4 @@ if (exitMatchingBtn) {
     exitMatchingBtn.addEventListener("click", () => {
         window.location.href = "posts.html";
     });
-} 
+}

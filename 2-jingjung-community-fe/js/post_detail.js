@@ -84,38 +84,50 @@ document.addEventListener("DOMContentLoaded", async () => {    // 1. 요소 가�
                 credentials: "include"
             });
 
-            if (!response.ok) throw new Error("게시글 로딩 실패");
+            if (!response.ok) {
+                throw new Error("게시글 로딩 실패: " + response.status);
+            }
 
-            const post = await response.json();
-            renderPost(post);
+            const data = await response.json();
+            const post = data.post; // 응답이 { "post": { ... } } 형태일 것으로 예상
+
+            if (!post) {
+                // 혹시 모르니 단일 객체로 오는 경우도 처리
+                if (data.post_id) {
+                    await renderPost(data);
+                } else {
+                    throw new Error("API 응답에서 'post' 객체를 찾을 수 없습니다.");
+                }
+            } else {
+                await renderPost(post);
+            }
+            
             loadComments();
 
         } catch (error) {
             console.error(error);
-            alert("존재하지 않는 게시글입니다.");
+            alert("존재하지 않는 게시글이거나 데이터를 불러오는 데 실패했습니다.");
             window.location.href = "posts.html";
         }
     }
 
     async function renderPost(post) {
-        postTitle.textContent = post.title;
-        postText.textContent = post.content;
-        authorName.textContent = post.author_nickname;
-        postDate.textContent = post.created_at;
+        postTitle.textContent = post.title || "제목 없음";
+        postText.textContent = post.content || "내용 없음";
+        authorName.textContent = post.author_nickname || "익명";
+        postDate.textContent = post.created_at ? new Date(post.created_at).toLocaleString() : "";
 
-            // Add 1:1 chat button
-            const chatWithAuthorBtn = document.getElementById("chatWithAuthorBtn");
-            if (chatWithAuthorBtn) {
-                const currentUserId = await loadMyProfile(); // Get current user ID
-                if (currentUserId && post.user_id !== currentUserId) { // Don't show chat with self
-                    chatWithAuthorBtn.style.display = "inline-block";
-                    chatWithAuthorBtn.onclick = () => {
-                        window.location.href = `chat.html?recipientId=${post.user_id}`;
-                    };
-                }
+        const chatWithAuthorBtn = document.getElementById("chatWithAuthorBtn");
+        if (chatWithAuthorBtn) {
+            const currentUserId = await loadMyProfile();
+            if (currentUserId && post.user_id && post.user_id !== currentUserId) {
+                chatWithAuthorBtn.style.display = "inline-block";
+                chatWithAuthorBtn.onclick = () => {
+                    window.location.href = `chat.html?recipientId=${post.user_id}`;
+                };
             }
+        }
         
-        // 작성자 프로필 이미지
         if (post.author_profile_image && authorProfileImg) {
             let imgUrl = post.author_profile_image;
             if(!imgUrl.startsWith("http")) imgUrl = BASE_URL + imgUrl;
@@ -125,7 +137,6 @@ document.addEventListener("DOMContentLoaded", async () => {    // 1. 요소 가�
             authorProfileImg.style.backgroundColor = "transparent";
         }
 
-        // 게시글 본문 이미지
         if (post.image && postImagePlaceholder) {
             let contentImgUrl = post.image;
             if(!contentImgUrl.startsWith("http")) contentImgUrl = BASE_URL + contentImgUrl;
@@ -145,9 +156,9 @@ document.addEventListener("DOMContentLoaded", async () => {    // 1. 요소 가�
             if(postImagePlaceholder) postImagePlaceholder.style.display = "none";
         }
 
-        likeCountElem.textContent = formatNumber(post.likes_count);
-        viewCountElem.textContent = formatNumber(post.views_count);
-        commentCountElem.textContent = formatNumber(post.comments_count);
+        likeCountElem.textContent = formatNumber(post.likes_count || 0);
+        viewCountElem.textContent = formatNumber(post.views_count || 0);
+        commentCountElem.textContent = formatNumber(post.comments_count || 0);
 
         if (post.is_liked) likeBtn.classList.add("active");
         else likeBtn.classList.remove("active");
