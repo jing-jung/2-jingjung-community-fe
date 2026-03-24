@@ -1,3 +1,6 @@
+import { CONFIG } from './config.js';
+const BASE_URL = CONFIG.BASE_URL;
+
 const introSection = document.getElementById("introSection");
 const datingSection = document.getElementById("datingSection");
 
@@ -25,7 +28,7 @@ const dummyBios = [
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 2. 내 프로필 불러오기 (여권)
+    // 2. 내 프로필 불러오기 
     loadMyProfileDataForIntro();
 });
 
@@ -40,12 +43,18 @@ async function loadMyProfileDataForIntro() {
                 let imgUrl = user.profile_image;
                 if (!imgUrl.startsWith("http")) imgUrl = BASE_URL + imgUrl;
                 introMyImage.src = imgUrl;
+            } else {
+                introMyImage.src = "./images/radish_7.png";
             }
             
             introMyName.textContent = user.nickname || user.username || "이름 모를 주민";
+        } else {
+            introMyName.textContent = "정보를 불러올 수 없습니다";
+            introMyImage.src = "./images/radish_7.png";
         }
     } catch (error) {
         introMyName.textContent = "에러구리!";
+        introMyImage.src = "./images/radish_7.png";
     }
 }
 
@@ -67,7 +76,7 @@ async function loadMatchingUsers() {
 
 function showNextUser() {
     if (currentUserIndex >= matchingUsers.length) {
-        datingImage.src = "./images/default-profile.png";
+        datingImage.src = "./images/radish_7.png";
         datingName.textContent = "끝!";
         datingDesc.textContent = "더 이상 추천할 이웃이 없습니다구리.";
         btnLike.style.display = "none";
@@ -82,7 +91,7 @@ function showNextUser() {
     
     let imgUrl = user.profile_image;
     if (imgUrl && !imgUrl.startsWith("http")) imgUrl = BASE_URL + imgUrl;
-    if (!imgUrl) imgUrl = "./images/default-profile.png";
+    if (!imgUrl) imgUrl = "./images/radish_7.png";
 
     datingImage.src = imgUrl;
     datingName.textContent = user.nickname || user.username || "이름 모를 주민";
