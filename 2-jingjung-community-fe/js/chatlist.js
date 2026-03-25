@@ -3,14 +3,25 @@ const BASE_URL = CONFIG.BASE_URL;
 import './header.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE_URL = `http://${CONFIG.BASE_URL}`;
+    // API_BASE_URL 선언 (http:// 중복 방지)
+    const API_BASE_URL = CONFIG.BASE_URL;
 
+    // 로그인 확인
     fetch(`${API_BASE_URL}/users/me`, { credentials: "include" })
         .then(res => { if (!res.ok) window.location.href = "login.html"; })
         .catch(e => { console.error("Login check failed:", e); window.location.href = "login.html"; });
 
     const chatListContainer = document.getElementById('chat-list-container');
+    const backBtn = document.getElementById('back-btn');
 
+    // 뒤로가기 버튼 기능
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            window.history.back();
+        });
+    }
+
+    // 채팅 목록 불러오기
     const fetchChatList = async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/chats`, { credentials: "include" });
@@ -27,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // 채팅 목록 화면에 그리기
     const renderChatList = (chats) => {
         chatListContainer.innerHTML = ''; 
         if (chats.length === 0) {
@@ -39,7 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
             chatItem.className = 'chat-item';
             chatItem.dataset.chatId = chat.room_id;
 
-            const profileImg = chat.other_user_image_url ? `<div class="profile-img" style="background-image: url('${API_BASE_URL}${chat.other_user_image_url}')"></div>` : '<div class="profile-img"></div>';
+            // 프로필 이미지 경로 처리
+            let profileUrl = chat.other_user_image_url || '';
+            if (profileUrl && !profileUrl.startsWith('http')) {
+                profileUrl = API_BASE_URL + profileUrl;
+            }
+
+            const profileImg = profileUrl ? `<div class="profile-img" style="background-image: url('${profileUrl}'); background-size: cover; background-position: center;"></div>` : '<div class="profile-img"></div>';
             const unreadCount = chat.unread_count > 0 ? `<div class="unread-count">${chat.unread_count}</div>` : '';
             const lastMessageTime = chat.last_message_created_at ? new Date(chat.last_message_created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
             
@@ -59,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // 채팅방 클릭 시 이동
     chatListContainer.addEventListener('click', (event) => {
         const chatItem = event.target.closest('.chat-item');
         if (chatItem) {

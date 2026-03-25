@@ -3,8 +3,8 @@ const BASE_URL = CONFIG.BASE_URL;
 import './header.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const API_BASE_URL = `http://${CONFIG.BASE_URL}`;
-    const WS_BASE_URL = `ws://${CONFIG.BASE_URL}`;
+    const API_BASE_URL = CONFIG.BASE_URL;
+    const WS_BASE_URL = CONFIG.BASE_URL.replace("http://", "ws://");
 
     let currentUserId;
     try {
@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const messageInput = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-btn');
     const backBtn = document.getElementById('back-btn');
-    const recipientNicknameEl = document.getElementById('recipient-nickname');
 
     let websocket;
 
@@ -52,10 +51,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch(`${API_BASE_URL}/chats/${currentChatId}/messages`, { credentials: "include" });
             if (response.ok) {
                 const data = await response.json();
-                messageContainer.innerHTML = ''; // Clear placeholder messages
+                messageContainer.innerHTML = ''; 
                 data.messages.forEach(msg => appendMessage(msg, msg.sender_id === currentUserId));
-            } else {
-                console.error('Failed to fetch chat history');
             }
         } catch (error) {
             console.error('Error fetching chat history:', error);
@@ -66,7 +63,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/chats`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }, // credentials: "include" will handle the cookie
+                headers: { 'Content-Type': 'application/json' },
+                credentials: "include", // ★ 핵심 추가: 쿠키를 보내 백엔드 인증 통과
                 body: JSON.stringify({ recipient_id: parseInt(recipientId) })
             });
 
@@ -107,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
         const messageText = messageInput.value.trim();
         if (messageText && websocket && websocket.readyState === WebSocket.OPEN) {
-            const message = { content: messageText }; // Changed 'text' to 'content' to match backend
+            const message = { content: messageText }; 
             websocket.send(JSON.stringify(message));
             
             const sentMessage = {
