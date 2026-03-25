@@ -80,7 +80,7 @@ function switchToDatingSection() {
 
 async function loadMatchingUsers() {
     try {
-        const res = await fetch(`${BASE_URL}/users`, {
+        const res = await fetch(`${BASE_URL}/users/matching`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include" 
@@ -92,7 +92,7 @@ async function loadMatchingUsers() {
             showNextUser();
         }
     } catch (error) {
-        console.error("매칭 유저 로드 실패:", error);
+        console.error(error);
     }
 }
 
@@ -148,11 +148,29 @@ if (submitBioBtn) {
 }
 
 if (btnLike) {
-    btnLike.addEventListener("click", () => {
+    btnLike.addEventListener("click", async () => {
         if (matchingUsers[currentUserIndex]) {
             const likedUser = matchingUsers[currentUserIndex];
             const userName = likedUser.nickname || likedUser.username || "이웃";
-            alert(`${userName}님에게 내 프로필과 사진을 보냈습니다!`);
+            
+            try {
+                // 백엔드에 실제 채팅방 생성 요청 보내기
+                const res = await fetch(`${BASE_URL}/chats`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: "include",
+                    body: JSON.stringify({ recipient_id: likedUser.id })
+                });
+
+                if (res.ok) {
+                    alert(`${userName}님과 연결되었습니다! '채팅 목록'에서 대화를 시작해보세요구리!`);
+                } else {
+                    console.error("채팅방 생성 실패");
+                }
+            } catch (error) {
+                console.error("매칭 오류:", error);
+            }
+
             currentUserIndex++;
             showNextUser();
         }
