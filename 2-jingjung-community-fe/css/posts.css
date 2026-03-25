@@ -742,3 +742,84 @@ body.no-scroll {
 .ac-btn-yes:hover {
     background-color: #92c583;
 }
+
+/* --- 지도 사용자 핀 (거꾸로 된 물방울 모양) 디자인 --- */
+
+/* 위치 지정을 위한 부모 컨테이너 */
+.user-pin-wrapper {
+    position: absolute;
+    transform: translate(-50%, -100%); /* 마커의 뾰족한 끝이 정확한 좌표를 가리키게 함 */
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 물방울 모양 마커 */
+.user-pin-marker {
+    width: 36px;
+    height: 36px;
+    background-color: #ff5e5e; /* 마커 색상 (동물의 숲 느낌나게 변경 가능) */
+    border-radius: 50% 50% 50% 0; /* 여기서 거꾸로 된 물방울 모양이 만들어집니다 */
+    transform: rotate(-45deg); /* 물방울 꼭짓점이 아래를 향하도록 회전 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+/* 마커 내부의 프로필 이미지 */
+.user-pin-image {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%; /* 이미지는 동그랗게 */
+    background-size: cover;
+    background-position: center;
+    background-color: white;
+    transform: rotate(45deg); /* 부모가 회전했으니 이미지는 정방향으로 다시 회전 */
+}
+
+/* 마우스 올릴 때 나오는 이름 툴팁 (기본은 숨김) */
+.user-pin-tooltip {
+    position: absolute;
+    bottom: 45px; /* 마커 위에 표시되도록 위치 */
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
+    transform: translateY(10px);
+    pointer-events: none; /* 클릭 방해 금지 */
+}
+
+/* 툴팁 아래 뾰족한 꼬리표 모양 */
+.user-pin-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+}
+
+/* 마우스 호버(Hover) 시 효과 */
+.user-pin-wrapper:hover .user-pin-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-pin-wrapper:hover .user-pin-marker {
+    transform: rotate(-45deg) scale(1.15); /* 살짝 커지면서 강조됨 */
+    background-color: #ff3b3b;
+    z-index: 100;
+}

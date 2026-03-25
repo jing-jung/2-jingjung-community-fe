@@ -380,79 +380,97 @@ acModal.init();
             document.body.classList.remove("no-scroll");
         });
     }
+
     const mapBtn = document.getElementById("mapBtn");
-const mapModal = document.getElementById("mapModal");
-const closeMapModal = document.getElementById("closeMapModal");
-const mapContainer = document.getElementById("mapContainer");
+    const mapModal = document.getElementById("mapModal");
+    const closeMapModal = document.getElementById("closeMapModal");
+    const mapContainer = document.getElementById("mapContainer");
 
-async function renderMapPins() {
-    mapContainer.innerHTML = ""; 
-    
-    try {
-        const res = await fetch(`${BASE_URL}/users`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
+    // 배경 이미지에 맞춰서 min, max 숫자를 수정하면 원하는 구역에만 띄울 수 있습니다!
+    const landAreas = [
+        { minX: 9.3, maxX: 50.3, minY: 11.4, maxY: 50.8 },  // 왼쪽 섬 구역
+        { minX: 50.0, maxX: 91.0, minY: 11.4, maxY: 50.8 }, // 오른쪽 섬 구역
+        { minX: 9.3, maxX: 91.0, minY: 50.8, maxY: 93.1 }   // 위쪽(아래쪽) 섬 구역
+    ];
 
-        if (res.ok) {
-            const users = await res.json(); 
-
-            users.forEach(user => {
-                const pin = document.createElement("div");
-                pin.className = "user-pin";
-                
-                const randomX = Math.random() * 90 + 5; 
-                const randomY = Math.random() * 85 + 7; 
-                
-                pin.style.left = `${randomX}%`;
-                pin.style.top = `${randomY}%`;
-                
-                let imgUrl = user.profile_image; 
-                if (imgUrl && !imgUrl.startsWith("http")) {
-                    imgUrl = BASE_URL + imgUrl;
-                }
-                
-                if (!imgUrl) {
-                    imgUrl = "./images/default-profile.png"; 
-                }
-
-                const userName = user.nickname || user.username || "이름 모를 주민";
-                
-                pin.innerHTML = `
-                    <img src="${imgUrl}" alt="${userName}" class="pin-image" onerror="this.src='./images/default-profile.png'">
-                    <span class="user-pin-name">${userName}</span>
-                `;
-                
-                pin.addEventListener("click", () => {
-                    alert(`${userName} 주민의 위치입니다구리!`);
-                });
-
-                mapContainer.appendChild(pin);
-            });
-        } else {
-            mapContainer.innerHTML = "<p style='margin-top: 50px; color: #888;'>주민 목록을 불러올 수 없습니다구리.<br>(백엔드 API 확인 필요)</p>";
-        }
-    } catch (error) {
-        console.error(error);
+    // 지정된 땅 영역 중 하나를 골라 랜덤 좌표를 생성하는 함수
+    function getRandomLandCoordinate() {
+        const area = landAreas[Math.floor(Math.random() * landAreas.length)];
+        const x = Math.random() * (area.maxX - area.minX) + area.minX;
+        const y = Math.random() * (area.maxY - area.minY) + area.minY;
+        return { x, y };
     }
-}
 
-if (mapBtn) {
-    mapBtn.addEventListener("click", () => {
-        renderMapPins(); 
-        mapModal.classList.remove("hidden");
-        document.body.classList.add("no-scroll");
-    });
-}
+    async function renderMapPins() {
+        mapContainer.innerHTML = ""; 
+        
+        try {
+            // 주소 수정: /users -> /users/locations
+            const res = await fetch(`${BASE_URL}/users/locations`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            });
 
-if (closeMapModal) {
-    closeMapModal.addEventListener("click", () => {
-        mapModal.classList.add("hidden");
-        document.body.classList.remove("no-scroll");
-    });
-}
+            if (res.ok) {
+                const users = await res.json(); 
+
+                users.forEach(user => {
+                    const pinWrapper = document.createElement("div");
+                    pinWrapper.className = "user-pin-wrapper";
+                    
+                    // 제한된 땅 영역 내에서 랜덤 좌표 추출
+                    const coords = getRandomLandCoordinate();
+                    pinWrapper.style.left = `${coords.x}%`;
+                    pinWrapper.style.top = `${coords.y}%`;
+                    
+                    // 백엔드에서 반환하는 키(image_url)에 맞게 처리
+                    let imgUrl = user.image_url; 
+                    if (imgUrl && !imgUrl.startsWith("http")) {
+                        imgUrl = BASE_URL + imgUrl;
+                    }
+                    if (!imgUrl) {
+                        imgUrl = "./images/default-profile.png"; 
+                    }
+
+                    const userName = user.nickname || "이름 모를 주민";
+                    
+                    // 💧 거꾸로 된 물방울 마커와 툴팁 HTML 구조
+                    pinWrapper.innerHTML = `
+                        <div class="user-pin-tooltip">${userName}</div>
+                        <div class="user-pin-marker">
+                            <div class="user-pin-image" style="background-image: url('${imgUrl}')"></div>
+                        </div>
+                    `;
+                    
+                    pinWrapper.addEventListener("click", () => {
+                        alert(`${userName} 주민의 위치입니다구리!`);
+                    });
+
+                    mapContainer.appendChild(pinWrapper);
+                });
+            } else {
+                mapContainer.innerHTML = "<p style='margin-top: 50px; color: #888;'>주민 목록을 불러올 수 없습니다구리.<br>(백엔드 API 확인 필요)</p>";
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    if (mapBtn) {
+        mapBtn.addEventListener("click", () => {
+            renderMapPins(); 
+            mapModal.classList.remove("hidden");
+            document.body.classList.add("no-scroll");
+        });
+    }
+
+    if (closeMapModal) {
+        closeMapModal.addEventListener("click", () => {
+            mapModal.classList.add("hidden");
+            document.body.classList.remove("no-scroll");
+        });
+    }
+
 
 const datingBannerBtn = document.getElementById("datingBannerBtn");
 
