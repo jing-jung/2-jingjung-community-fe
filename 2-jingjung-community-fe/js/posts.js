@@ -215,58 +215,69 @@ acModal.init();
     }
     
     function renderPosts(posts) {
-        posts.forEach(post => {
-            const card = document.createElement("div");
-            card.className = "post-card";
-            
-            card.onclick = (e) => {
-                if (e.target.closest('.post-author')) return;
-                
-                window.location.href = `post_detail.html?id=${post.post_id}`;
-            };
-            
-            let profileUrl = post.author_profile_image || "";
-            if(profileUrl && !profileUrl.startsWith("http")) {
-                profileUrl = BASE_URL + profileUrl;
-            }
+    posts.forEach(post => {
+        const card = document.createElement("div");
+        card.className = "post-card";
+        
+        card.onclick = (e) => {
+            if (e.target.closest('.post-author')) return;
+            window.location.href = `post_detail.html?id=${post.post_id}`;
+        };
+        
+        let profileUrl = post.author_profile_image || "";
+        if(profileUrl && !profileUrl.startsWith("http")) {
+            profileUrl = BASE_URL + profileUrl;
+        }
 
-            const formatNumber = (num) => {
-                if (num >= 1000) return Math.floor(num / 1000) + "k";
-                return num;
-            };
+        let postImageUrl = post.image || "";
+        if(postImageUrl && !postImageUrl.startsWith("http")) {
+            postImageUrl = BASE_URL + postImageUrl;
+        }
 
-            card.innerHTML = `
-                <div class="post-header">
-                    <h3 class="post-title">${escapeHtml(post.title)}</h3>
-                    <div class="post-meta">
-                        <span>좋아요 ${formatNumber(post.likes)}</span>
-                        <span>댓글 ${formatNumber(post.comments)}</span>
-                        <span>조회수 ${formatNumber(post.views)}</span>
-                        <span class="date">${post.created_at}</span>
-                    </div>
+        const formatNumber = (num) => {
+            if (num >= 1000) return Math.floor(num / 1000) + "k";
+            return num;
+        };
+
+        card.innerHTML = `
+            <div class="post-author" style="cursor: pointer;">
+                <div class="author-profile" 
+                     style="background-image: url('${profileUrl}'); 
+                            background-size: cover; 
+                            background-position: center; 
+                            background-color: #ddd;">
                 </div>
-                <div class="post-author" style="cursor: pointer;" title="쪽지 보내기">
-                    <div class="author-profile" 
-                         style="background-image: url('${profileUrl}'); 
-                                background-size: cover; 
-                                background-position: center; 
-                                background-color: #ddd;">
-                    </div>
-                    <span class="author-name">${escapeHtml(post.author_nickname)}</span>
+                <span class="author-name">${post.author_nickname}</span>
+            </div>
+
+            ${postImageUrl ? `
+            <div class="post-image-container">
+                <img src="${postImageUrl}" class="post-list-img" alt="게시글 이미지">
+            </div>
+            ` : ''}
+
+            <div class="post-header">
+                <h3 class="post-title">${post.title}</h3>
+                <div class="post-meta">
+                    <span>좋아요 ${formatNumber(post.likes || post.likes_count || 0)}</span>
+                    <span>댓글 ${formatNumber(post.comments || post.comments_count || 0)}</span>
+                    <span>조회수 ${formatNumber(post.views || post.views_count || 0)}</span>
+                    <span class="date">${post.created_at ? post.created_at.split(' ')[0] : ''}</span>
                 </div>
-            `;
-            
-            const authorSection = card.querySelector('.post-author');
-            authorSection.addEventListener('click', (e) => {
-                e.stopPropagation(); 
-                acModal.open(post.author_nickname, () => {
-                    window.location.href = `chat.html?recipientId=${post.user_id}`;
-                });
+            </div>
+        `;
+        
+        const authorSection = card.querySelector('.post-author');
+        authorSection.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            acModal.open(post.author_nickname, () => {
+                window.location.href = `chat.html?recipientId=${post.user_id}`;
             });
-
-            postList.appendChild(card);
         });
-    }
+
+        postList.appendChild(card);
+    });
+}
 
     const observer = new IntersectionObserver(async (entries) => {
         const entry = entries[0];
