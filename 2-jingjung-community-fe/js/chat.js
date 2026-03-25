@@ -99,6 +99,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     messageInput.addEventListener('input', () => {
         sendBtn.disabled = messageInput.value.trim() === '';
+        // Auto-resize textarea
+        messageInput.style.height = 'auto';
+        messageInput.style.height = `${messageInput.scrollHeight}px`;
     });
 
     messageForm.addEventListener('submit', (e) => {
@@ -116,6 +119,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             messageInput.value = '';
             sendBtn.disabled = true;
+            // Reset textarea height
+            messageInput.style.height = 'auto';
         }
     });
 

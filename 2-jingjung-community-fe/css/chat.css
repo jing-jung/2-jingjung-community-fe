@@ -1,126 +1,194 @@
-/* 기본 초기화 */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Suit', sans-serif;
-}
+@import url('https://fonts.googleapis.com/css2?family=Gaegu&display=swap');
 
+/* General body and layout styles */
 body {
-    background-color: #FDF6E3;
-    background-image: repeating-linear-gradient(
-        transparent,
-        transparent 28px,
-        #E6D5B8 28px,
-        #E6D5B8 30px
-    );
-    background-attachment: local; 
-    color: #333;
-    height: 100vh;
-    padding-top: 60px;
-    
+    background-color: #A8D5BA; /* A soft, grassy green */
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2395C7A9' fill-opacity='0.6'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/svg%3E");
+    font-family: 'Gaegu', cursive;
     display: flex;
     flex-direction: column;
-    align-items: center; 
+    height: 100vh;
+    margin: 0;
+    padding-top: 60px; /* Space for the fixed header */
 }
 
-/* 채팅 내역이 보이는 영역 */
-.chat-box {
-    flex: 1;
+/* Main container for the chat interface */
+.container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 60px); /* Adjust height for the header */
+    background: #F7F1E5; /* Creamy paper color */
+    border: 15px solid #D4B996; /* Wood-like border */
+    border-radius: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2), inset 0 0 0 5px #B3967D;
+}
+
+/* Chat header styling */
+.chat-header {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px;
+    background-color: #D4B996; /* Matching wood color */
+    color: #5C4B3E;
+    border-bottom: 5px solid #B3967D;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    flex-grow: 1;
+    text-align: center;
+    text-shadow: 1px 1px 0 #FFF8E1;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: #5C4B3E;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    padding-right: 10px;
+    text-shadow: 1px 1px 0 #FFF8E1;
+}
+
+/* Message container for chat bubbles */
+.message-container {
+    flex-grow: 1;
     overflow-y: auto;
     padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    
-    width: 100%;
-    max-width: 600px;
+    gap: 12px;
 }
 
-/* 공통 말풍선 스타일 */
+/* General message bubble style */
 .message {
     display: flex;
-    flex-direction: column;
     max-width: 75%;
+    align-items: flex-end;
 }
 
 .message-content {
-    padding: 12px 18px;
-    border-radius: 20px;
-    font-size: 15px;
-    line-height: 1.4;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    padding: 12px 20px;
+    border-radius: 25px;
+    line-height: 1.6;
+    word-wrap: break-word;
+    font-size: 18px;
+    color: #5C4B3E;
     position: relative;
-}
+}   
 
-/* 상대방 말풍선 (왼쪽, 하얀색) */
-.message.received {
-    align-self: flex-start;
-}
-
-.message.received .message-content {
-    background-color: #ffffff;
-    color: #795548;
-    border: 2px solid #E6D5B8;
-    border-bottom-left-radius: 5px; /* 꼬리표 느낌 */
-}
-
-.message.received .sender-name {
+.message-time {
     font-size: 12px;
-    color: #888;
-    margin-bottom: 5px;
-    margin-left: 5px;
+    color: #9C8269;
+    margin: 0 10px;
+    white-space: nowrap;
 }
 
-/* 내 말풍선 (오른쪽, 도도항공 오렌지/노란색) */
+/* Sent messages (user's) */
 .message.sent {
     align-self: flex-end;
+    flex-direction: row-reverse;
 }
 
 .message.sent .message-content {
-    background-color: #FFB74D; /* 따뜻한 오렌지색 */
-    color: #fff;
-    border: 2px solid #F57C00;
-    border-bottom-right-radius: 5px; /* 꼬리표 느낌 */
+    background-color: #87C4A5; /* A gentle, leafy green */
+    border: 3px solid #6B9C87;
+    border-bottom-right-radius: 8px;
+    box-shadow: 3px 3px 0px #A0D1B6;
 }
 
-/* 하단 채팅 입력창 (편지 봉투 닫는 부분 느낌) */
-.chat-input-container {
-    background-color: #FDF6E3;
-    border-top: 3px dashed #D3A13B;
-    padding: 15px 20px;
-    display: flex;
-    gap: 10px;
-    
-    width: 100%;
-    max-width: 600px;
-    box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+/* Received messages (other user's) */
+.message.received {
+    align-self: flex-start;
+    flex-direction: row;
 }
-.chat-input {
-    flex: 1;
-    padding: 12px 15px;
-    border: 2px solid #E6D5B8;
-    border-radius: 15px;
-    outline: none;
-    font-size: 15px;
+
+.message.received .message-content {
     background-color: #fff;
+    border: 3px solid #D8C8B6;
+    border-bottom-left-radius: 8px;
+    box-shadow: 3px 3px 0px #EAE0D6;
 }
 
-.chat-input:focus {
-    border-color: #D3A13B;
+/* System messages */
+.system-message {
+    text-align: center;
+    color: #9C8269;
+    font-size: 15px;
+    margin: 10px 0;
 }
 
-.send-btn {
-    background-color: #D3A13B;
-    color: white;
-    border: none;
-    padding: 0 20px;
-    border-radius: 15px;
-    font-weight: bold;
+/* Message input form styling */
+.message-input-form {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #D4B996;
+    border-top: 5px solid #B3967D;
+}
+
+/* Textarea for typing messages */
+#message-input {
+    flex-grow: 1;
+    border: 3px solid #B3967D;
+    border-radius: 20px;
+    padding: 10px 18px;
+    font-size: 18px;
+    line-height: 1.5;
+    resize: none;
+    overflow-y: auto;
+    max-height: 100px;
+    background: #F7F1E5;
+    color: #5C4B3E;
+    font-family: 'Gaegu', cursive;
+}
+
+#message-input:focus {
+    outline: none;
+    border-color: #8A6E51;
+    box-shadow: 0 0 8px rgba(138, 110, 81, 0.4);
+}
+
+/* Send button styling */
+#send-btn {
+    background: #76B947; /* Leafy green button */
+    border: 3px solid #5C9036;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    margin-left: 10px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+}
+#send-btn img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.2));
 }
 
-.send-btn:hover {
-    background-color: #B8860B;
+#send-btn:hover {
+    background-color: #88C959;
+}
+
+#send-btn:disabled {
+    background-color: #A8C894;
+    border-color: #8AAB74;
+    cursor: not-allowed;
+}
+#send-btn:disabled img {
+    opacity: 0.6;
+}
+
+#send-btn:active:not(:disabled) {
+    transform: scale(0.9);
 }
