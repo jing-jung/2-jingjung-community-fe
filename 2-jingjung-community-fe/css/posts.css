@@ -467,6 +467,97 @@ body.no-scroll {
     100% { transform: rotate(360deg); }
 }
 
+/* --- 기차표 티켓 디자인 --- */
+.ticket-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin: 20px 0;
+    padding: 10px;
+}
+
+.train-ticket {
+    display: flex;
+    background: #fdfbf7;
+    border: 2px solid #e2d9c8;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 15px;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.train-ticket:hover {
+    transform: translateY(-2px);
+}
+
+/* 시간이 지나서 만료된 티켓 (회색 처리) */
+.train-ticket.expired {
+    background: #e0e0e0;
+    border-color: #bdbdbd;
+    filter: grayscale(100%);
+    opacity: 0.7;
+}
+
+.ticket-left {
+    flex: 3;
+    padding: 15px;
+    border-right: 2px dashed #d1c4a9; /* 절취선 느낌 */
+    text-align: left;
+}
+
+.ticket-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #73d197; /* 모동숲 연두색 */
+    color: white;
+    border-radius: 0 10px 10px 0;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.train-ticket.expired .ticket-right {
+    background-color: #95a5a6; /* 만료 시 회색 */
+}
+
+.ticket-title {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.ticket-time {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.ticket-info {
+    font-size: 13px;
+    color: #666;
+}
+
+.expired-stamp {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    color: #e74c3c;
+    border: 3px solid #e74c3c;
+    padding: 5px 10px;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 8px;
+    opacity: 0;
+}
+
+.train-ticket.expired .expired-stamp {
+    opacity: 0.8; /* 만료된 티켓에만 도장 표시 */
+}
+
 .queue-count {
     margin-top: 25px;
     font-weight: bold;

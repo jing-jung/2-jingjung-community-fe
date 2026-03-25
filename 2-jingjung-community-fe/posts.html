@@ -84,13 +84,24 @@
 
     <div id="trainModal" class="modal-overlay hidden">
         <div class="train-modal-box">
-            <div class="leaf-icon"><img src="./images/leaf_1.png" alt="나뭇잎"></div> <h3 class="train-title">너굴 레일 시간표</h3>
+            <div class="leaf-icon"><img src="./images/leaf_1.png" alt="나뭇잎"></div> 
+            <h3 class="train-title">너굴 레일 시간표</h3>
             <p class="train-desc">원하시는 출발 시간의 표를 예매해주세요구리!</p>
             
             <div class="timetable-list" id="timetableList">
-                </div>
+            </div>
             
+            <button id="checkMyReservationBtn" class="turnip-btn" style="width: 100%; margin-top: 15px; background-color: #6c5ce7;">🎫 내 예약 확인하기</button>
             <button id="closeTrainModal" class="turnip-close-btn">닫기</button>
+        </div>
+    </div>
+
+    <div id="myReservationModal" class="modal-overlay hidden">
+        <div class="train-modal-box ticket-modal-content">
+            <h3>✈️ 내 기차표 보관함</h3>
+            <div id="ticketContainer" class="ticket-container">
+            </div>
+            <button id="closeMyReservationModal" class="turnip-close-btn">닫기</button>
         </div>
     </div>
 

@@ -309,6 +309,8 @@ acModal.init();
             currentOffset += newPosts.length;
         })();
     }
+    
+    // --- 기차 예매 및 확인 로직 ---
     const trainBtn = document.getElementById("trainBtn");
     const trainModal = document.getElementById("trainModal");
     const closeTrainModal = document.getElementById("closeTrainModal");
@@ -316,6 +318,12 @@ acModal.init();
     
     const queueModal = document.getElementById("queueModal");
     const queueNumberSpan = document.getElementById("queueNumber");
+
+    // 내 예약 확인 관련 변수
+    const checkMyReservationBtn = document.getElementById("checkMyReservationBtn");
+    const myReservationModal = document.getElementById("myReservationModal");
+    const closeMyReservationModal = document.getElementById("closeMyReservationModal");
+    const ticketContainer = document.getElementById("ticketContainer");
 
     function renderTimetable() {
         timetableList.innerHTML = "";
@@ -327,7 +335,6 @@ acModal.init();
             const isPast = i <= currentHour; 
             
             row.className = `timetable-row ${isPast ? 'past' : ''}`;
-            
             const timeString = `${i < 10 ? '0'+i : i}:00 출발`;
             
             row.innerHTML = `
@@ -338,27 +345,57 @@ acModal.init();
             if (!isPast) {
                 const btn = row.querySelector('.reserve-btn');
                 btn.addEventListener("click", () => {
-                    startReservationQueue();
+                    startReservationQueue(i); // 시간(hour)을 전달합니다
                 });
             }
             timetableList.appendChild(row);
         }
     }
 
-    function startReservationQueue() {
+    function startReservationQueue(hour) {
         trainModal.classList.add("hidden"); 
         queueModal.classList.remove("hidden"); 
         
         let waitNumber = Math.floor(Math.random() * 200) + 50; 
         queueNumberSpan.textContent = waitNumber;
 
-        const interval = setInterval(() => {
+        const interval = setInterval(async () => {
             waitNumber -= Math.floor(Math.random() * 10) + 5; 
             
             if (waitNumber <= 0) {
                 clearInterval(interval); 
+                
+                // ⭐ 가짜가 아닌 진짜 백엔드로 예매 요청 전송!
+                try {
+                    const today = new Date();
+                    // 예약 시간 생성 (오늘 날짜 + 선택한 시간)
+                    const departureTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hour, 0, 0);
+                    
+                    // 한국 시간에 맞춰 DB 저장용 문자열로 변환 (YYYY-MM-DD HH:mm:ss)
+                    const tzOffset = departureTime.getTimezoneOffset() * 60000;
+                    const localISOTime = (new Date(departureTime - tzOffset)).toISOString().slice(0, 19).replace('T', ' ');
+
+                    const res = await fetch(`${BASE_URL}/train/reserve`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({ 
+                            train_number: `Nook-${hour}00`, 
+                            departure_time: localISOTime
+                        })
+                    });
+
+                    if (res.ok) {
+                        alert("기차표 예매가 완료되었습니다구리! 즐거운 여행 되세요! ✈️");
+                    } else {
+                        const error = await res.json();
+                        alert(`예매 실패: ${error.detail}`);
+                    }
+                } catch (e) {
+                    console.error("예매 에러", e);
+                }
+
                 queueModal.classList.add("hidden"); 
-                alert("기차표 예매가 완료되었습니다구리! 즐거운 여행 되세요! ✈️");
                 document.body.classList.remove("no-scroll");
             } else {
                 queueNumberSpan.textContent = waitNumber; 
@@ -366,6 +403,59 @@ acModal.init();
         }, 400); 
     }
 
+    // 내 기차표 목록 불러와서 티켓 그리기
+    async function fetchAndRenderMyReservations() {
+        ticketContainer.innerHTML = "<p>티켓을 조회하는 중입니다구리...</p>";
+        try {
+            const res = await fetch(`${BASE_URL}/train/reservations`, { credentials: "include" });
+            if (res.ok) {
+                const data = await res.json();
+                const reservations = data.reservations;
+
+                if (reservations.length === 0) {
+                    ticketContainer.innerHTML = "<p>예매한 기차표가 없습니다구리!</p>";
+                    return;
+                }
+
+                ticketContainer.innerHTML = "";
+                const now = new Date();
+
+                reservations.forEach(ticket => {
+                    const depTime = new Date(ticket.departure_time);
+                    // 예약 시간이 현재 시간보다 과거인지 확인 (만료 여부)
+                    const isExpired = depTime < now;
+
+                    const ticketDiv = document.createElement("div");
+                    ticketDiv.className = `train-ticket ${isExpired ? 'expired' : ''}`;
+                    
+                    // 날짜 형식 예쁘게 변환 (예: 2026-03-25 15:00)
+                    const formattedTime = depTime.toLocaleString('ko-KR', { 
+                        month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                    });
+
+                    ticketDiv.innerHTML = `
+                        <div class="ticket-left">
+                            <div class="ticket-title">Nook Inc. 편도 탑승권</div>
+                            <div class="ticket-time">${formattedTime} 출발</div>
+                            <div class="ticket-info">편명: ${ticket.train_number}</div>
+                            <div class="expired-stamp">기한 만료</div>
+                        </div>
+                        <div class="ticket-right">
+                            ${isExpired ? 'X' : '🎫'}
+                        </div>
+                    `;
+                    ticketContainer.appendChild(ticketDiv);
+                });
+            } else {
+                ticketContainer.innerHTML = "<p>로그인이 필요하거나 오류가 발생했습니다.</p>";
+            }
+        } catch (error) {
+            console.error(error);
+            ticketContainer.innerHTML = "<p>오류가 발생했습니다.</p>";
+        }
+    }
+
+    // 이벤트 리스너 연결
     if (trainBtn) {
         trainBtn.addEventListener("click", () => {
             renderTimetable(); 
@@ -377,6 +467,21 @@ acModal.init();
     if (closeTrainModal) {
         closeTrainModal.addEventListener("click", () => {
             trainModal.classList.add("hidden");
+            document.body.classList.remove("no-scroll");
+        });
+    }
+
+    if (checkMyReservationBtn) {
+        checkMyReservationBtn.addEventListener("click", () => {
+            trainModal.classList.add("hidden"); // 예매 창은 닫고
+            fetchAndRenderMyReservations(); // 티켓 목록 불러오기
+            myReservationModal.classList.remove("hidden"); // 내 티켓 창 열기
+        });
+    }
+
+    if (closeMyReservationModal) {
+        closeMyReservationModal.addEventListener("click", () => {
+            myReservationModal.classList.add("hidden");
             document.body.classList.remove("no-scroll");
         });
     }
