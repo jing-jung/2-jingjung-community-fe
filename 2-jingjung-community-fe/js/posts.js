@@ -422,13 +422,11 @@ acModal.init();
 
                 reservations.forEach(ticket => {
                     const depTime = new Date(ticket.departure_time);
-                    // 예약 시간이 현재 시간보다 과거인지 확인 (만료 여부)
                     const isExpired = depTime < now;
 
                     const ticketDiv = document.createElement("div");
                     ticketDiv.className = `train-ticket ${isExpired ? 'expired' : ''}`;
                     
-                    // 날짜 형식 예쁘게 변환 (예: 2026-03-25 15:00)
                     const formattedTime = depTime.toLocaleString('ko-KR', { 
                         month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
                     });
@@ -441,9 +439,34 @@ acModal.init();
                             <div class="expired-stamp">기한 만료</div>
                         </div>
                         <div class="ticket-right">
-                            ${isExpired ? 'X' : '🎫'}
+                            <span style="font-size: 24px;">${isExpired ? 'X' : '🎫'}</span>
+                            ${!isExpired ? `<button class="cancel-ticket-btn" data-id="${ticket.id}">취소하기</button>` : ''}
                         </div>
                     `;
+
+                    // 취소 버튼 이벤트 연결 (만료되지 않은 티켓만)
+                    if (!isExpired) {
+                        const cancelBtn = ticketDiv.querySelector('.cancel-ticket-btn');
+                        cancelBtn.addEventListener('click', async () => {
+                            if (confirm("정말로 기차표 예매를 취소하시겠습니까구리?")) {
+                                try {
+                                    const delRes = await fetch(`${BASE_URL}/train/reservations/${ticket.id}`, {
+                                        method: "DELETE",
+                                        credentials: "include"
+                                    });
+                                    if (delRes.ok) {
+                                        alert("예매가 취소되었습니다구리.");
+                                        fetchAndRenderMyReservations(); // 취소 후 목록 새로고침
+                                    } else {
+                                        alert("취소에 실패했습니다.");
+                                    }
+                                } catch (e) {
+                                    console.error("취소 오류:", e);
+                                }
+                            }
+                        });
+                    }
+
                     ticketContainer.appendChild(ticketDiv);
                 });
             } else {

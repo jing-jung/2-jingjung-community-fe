@@ -557,6 +557,29 @@ body.no-scroll {
 .train-ticket.expired .expired-stamp {
     opacity: 0.8; /* 만료된 티켓에만 도장 표시 */
 }
+/* 기차표 취소 버튼 디자인 */
+.cancel-ticket-btn {
+    margin-top: 10px;
+    padding: 6px 10px;
+    background-color: #ff7675; /* 부드러운 빨간색 */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.cancel-ticket-btn:hover {
+    background-color: #d63031;
+    transform: translateY(-1px);
+}
+
+.cancel-ticket-btn:active {
+    transform: translateY(1px);
+}
 
 .queue-count {
     margin-top: 25px;
