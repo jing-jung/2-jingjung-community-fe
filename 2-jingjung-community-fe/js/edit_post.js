@@ -22,17 +22,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
     
-    // Check if user is logged in, otherwise redirect
-    fetch(`${BASE_URL}/users/me`, { credentials: "include" })
-        .then(res => {
-            if (!res.ok) {
-                window.location.href = "login.html";
-            }
-        })
-        .catch(e => {
-            console.error("Login check failed:", e);
-            window.location.href = "login.html";
-        });
+    // // Check if user is logged in, otherwise redirect
+    // fetch(`${BASE_URL}/users/me`, { credentials: "include" })
+    //     .then(res => {
+    //         if (!res.ok) {
+    //             window.location.href = "login.html";
+    //         }
+    //     })
+    //     .catch(e => {
+    //         console.error("Login check failed:", e);
+    //         window.location.href = "login.html";
+    //     });
 
     // 뒤로가기
     if (backBtn) {
