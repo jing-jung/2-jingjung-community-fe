@@ -1,0 +1,269 @@
+/* css/posts/train.css */
+
+.train-floating-btn {
+    position: fixed;
+    bottom: 100px; /* 무 버튼 위로 띄움 */
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #78C484; /* 동숲 초록색 */
+    border: 3px solid #5EAB6B;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 90;
+    transition: transform 0.2s;
+}
+
+.train-floating-btn:hover {
+    transform: scale(1.1);
+}
+
+.train-floating-btn img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.train-modal-box {
+    background-color: #FDF6E3; 
+    border: 6px solid #78C484; 
+    padding: 30px 20px;
+    border-radius: 25px;
+    width: 90%;
+    max-width: 380px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.leaf-icon {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #FDF6E3;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.leaf-icon img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.train-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #795548;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.train-desc {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.timetable-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    max-height: 40vh; /* 너무 길어지면 안에서 스크롤 */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.timetable-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    border: 2px solid #E6D5B8;
+    padding: 12px 15px;
+    border-radius: 15px;
+}
+
+.timetable-row.past {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+    color: #aaa;
+}
+
+.time-info {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.reserve-btn {
+    background-color: #D3A13B;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.timetable-row.past .reserve-btn {
+    background-color: #ccc;
+    cursor: not-allowed;
+    pointer-events: none; 
+}
+
+.queue-box {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    width: 80%;
+    max-width: 320px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    border: 2px solid #78C484;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 6px solid #E6D5B8;
+    border-top: 6px solid #78C484;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.ticket-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin: 20px 0;
+    padding: 10px;
+}
+
+.train-ticket {
+    display: flex;
+    background: #fdfbf7;
+    border: 2px solid #e2d9c8;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 15px;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.train-ticket:hover {
+    transform: translateY(-2px);
+}
+
+.train-ticket.expired {
+    background: #e0e0e0;
+    border-color: #bdbdbd;
+    filter: grayscale(100%);
+    opacity: 0.7;
+}
+
+.ticket-left {
+    flex: 3;
+    padding: 15px;
+    border-right: 2px dashed #d1c4a9; /* 절취선 느낌 */
+    text-align: left;
+}
+
+.ticket-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #73d197; /* 모동숲 연두색 */
+    color: white;
+    border-radius: 0 10px 10px 0;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.train-ticket.expired .ticket-right {
+    background-color: #95a5a6; /* 만료 시 회색 */
+}
+
+.ticket-title {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.ticket-time {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.ticket-info {
+    font-size: 13px;
+    color: #666;
+}
+
+.expired-stamp {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    color: #e74c3c;
+    border: 3px solid #e74c3c;
+    padding: 5px 10px;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 8px;
+    opacity: 0;
+}
+
+.train-ticket.expired .expired-stamp {
+    opacity: 0.8; /* 만료된 티켓에만 도장 표시 */
+}
+.cancel-ticket-btn {
+    margin-top: 10px;
+    padding: 6px 10px;
+    background-color: #ff7675; /* 부드러운 빨간색 */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.cancel-ticket-btn:hover {
+    background-color: #d63031;
+    transform: translateY(-1px);
+}
+
+.cancel-ticket-btn:active {
+    transform: translateY(1px);
+}
+
+.queue-count {
+    margin-top: 25px;
+    font-weight: bold;
+    color: #FF5A5A;
+    font-size: 18px;
+    background-color: #FFF0F0;
+    padding: 10px;
+    border-radius: 10px;
+}
