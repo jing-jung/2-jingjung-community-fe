@@ -34,3 +34,10 @@ spec:
       port: 80
       targetPort: 80
   type: LoadBalancer
+
+  metadata:
+  annotations:
+    # 1. 외부 인터넷용 로드밸런서라고 명시
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    # 2. 로드밸런서가 위치할 'Public Subnet'들의 ID를 쉼표로 나열 (중요!)
+    service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-0056e2194368afa19, subnet-07497df0436c8d138"
