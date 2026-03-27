@@ -8,7 +8,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
+      id-token: write # OIDC를 위해 필수
       contents: read
     steps:
       - name: Checkout code
@@ -22,13 +22,16 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and Push Images
+      - name: Build and Push Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: community-fe
+          IMAGE_TAG: latest
         run: |
-          # 프론트엔드 ECR 리포지토리 이름(community-fe) 확인
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/community-fe:latest .
-          docker push ${{ steps.login-ecr.outputs.registry }}/community-fe:latest
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
       - name: Update kubeconfig
         run: |
@@ -37,4 +40,5 @@ jobs:
       - name: Deploy to EKS
         run: |
           kubectl apply -f frontend-deployment.yaml
+          # 이미지가 교체되었음을 인식시키기 위해 재시작
           kubectl rollout restart deployment frontend-deployment
