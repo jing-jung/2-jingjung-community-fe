@@ -48,8 +48,8 @@ async function loadMyProfile() {
                 headerProfileIcon.style.backgroundColor = "transparent"; 
             }
 
-            if (bellAmountSpan && typeof user.bell_amount !== 'undefined') {
-                bellAmountSpan.textContent = user.bell_amount.toLocaleString();
+            if (bellAmountSpan && typeof user.bell !== 'undefined') {
+                bellAmountSpan.textContent = user.bell.toLocaleString();
             }
 
             const headerTitle = document.getElementById('headerTitle');
