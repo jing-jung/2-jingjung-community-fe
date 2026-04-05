@@ -28,7 +28,14 @@ async function loadMyProfile() {
     const bellAmountSpan = document.querySelector('.bell-amount');
 
     try {
-        const res = await fetch(`${BASE_URL}/users/me`, { credentials: "include" });
+        const res = await fetch(`${BASE_URL}/users/me`, { 
+            credentials: "include",
+            cache: "no-store", // 브라우저야, 옛날 데이터(캐시) 쓰지 말고 무조건 서버한테 다시 물어봐!
+            headers: {
+                "Cache-Control": "no-cache"
+            }
+        });
+
         if (res.ok) {
             const user = await res.json();
             
