@@ -111,32 +111,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     nicknameInput.addEventListener("input", validateNickname);
 
-    // 회원정보 수정 
+// 회원정보 수정 
     submitBtn.addEventListener("click", async () => {
         if (!validateNickname() || !currentUserId) {
             return; 
         }
+        submitBtn.disabled = true; // 중복 클릭 방지
 
-        // 2. 전송 데이터 준비 
-        const payload = {
-            nickname: nicknameInput.value.trim()
-        };
+        // 🚀 1. JSON 대신 FormData를 사용해서 사진까지 꽉꽉 담아줍니다!
+        const formData = new FormData();
+        formData.append("nickname", nicknameInput.value.trim());
+        
+        // 만약 유저가 새 사진을 선택했다면 formData에 추가!
+        const profileFile = profileInput.files[0];
+        if (profileFile) {
+            formData.append("profile_image", profileFile);
+        }
 
         try {
             const response = await fetch(`${BASE_URL}/users/${currentUserId}`, {
                 method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json", 
-                },
+                // 🚀 2. FormData를 보낼 때는 headers에서 "Content-Type"을 아예 지워야 브라우저가 알아서 처리합니다!
                 credentials: "include",
-                body: JSON.stringify(payload)
+                body: formData
             });
 
             if (response.ok) {
                 showToast("수정완료");
+                setTimeout(() => { window.location.reload(); }, 1000); // 1초 뒤 새로고침해서 새 사진 띄우기
             } else {
                 const errorData = await response.json();
-                
                 if (errorData.detail && typeof errorData.detail === 'string' && errorData.detail.includes("중복")) {
                      nicknameError.textContent = "*중복된 닉네임 입니다.";
                 } else {
@@ -146,6 +150,8 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
             console.error("Update Error:", error);
             alert("서버 연결에 실패했습니다.");
+        } finally {
+            submitBtn.disabled = false;
         }
     });
 
