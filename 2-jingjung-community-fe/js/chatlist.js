@@ -38,18 +38,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 타임스탬프 포맷팅 함수
-    const formatTimestamp = (timestamp) => {
-        if (!timestamp) return '';
-
-        let serverTime = timestamp;
-        serverTime = serverTime.replace(" ", "T");
+    // 서버 타임스탬프 파싱 헬퍼 함수
+    const parseServerTime = (timestamp) => {
+        if (!timestamp) return null;
+        let serverTime = timestamp.replace(" ", "T");
         if (!serverTime.endsWith("Z")) {
             serverTime += "Z";
         }
+        return new Date(serverTime);
+    };
+
+    // 타임스탬프 포맷팅 함수
+    const formatTimestamp = (timestamp) => {
+        const messageDate = parseServerTime(timestamp);
+        if (!messageDate) return '';
 
         const now = new Date();
-        const messageDate = new Date(timestamp);
 
         const isToday = now.getFullYear() === messageDate.getFullYear() &&
                         now.getMonth() === messageDate.getMonth() &&
@@ -73,7 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 최신 메시지 순으로 정렬
-        chats.sort((a, b) => new Date(b.last_message_created_at) - new Date(a.last_message_created_at));
+        chats.sort((a, b) => {
+            const dateA = parseServerTime(a.last_message_created_at) || new Date(0);
+            const dateB = parseServerTime(b.last_message_created_at) || new Date(0);
+            return dateB - dateA;
+        });
 
         chats.forEach(chat => {
             const chatItem = document.createElement('div');
