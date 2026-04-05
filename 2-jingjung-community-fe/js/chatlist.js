@@ -42,6 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatTimestamp = (timestamp) => {
         if (!timestamp) return '';
 
+        let serverTime = timestamp;
+        serverTime = serverTime.replace(" ", "T");
+        if (!serverTime.endsWith("Z")) {
+            serverTime += "Z";
+        }
+
         const now = new Date();
         const messageDate = new Date(timestamp);
 

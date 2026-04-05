@@ -21,9 +21,18 @@ async function renderPost(postData, elements, BASE_URL) {
     const { postTitle, postText, authorName, postDate, authorProfileImg, postImagePlaceholder, likeCountElem, viewCountElem, commentCountElem, likeBtn, postEditBtn, postDeleteBtn, chatWithAuthorBtn } = elements;
     
     postTitle.textContent = postData.title || "제목 없음";
-    postText.textContent = postData.contents || "내용 없음";
+    postText.textContent = postData.contents || "내용 없음"; 
     authorName.textContent = postData.author_nickname || "익명";
-    postDate.textContent = postData.created_at ? new Date(postData.created_at).toLocaleString() : "";
+
+    // 🚀 시차 해결 로직 (중복된 코드 제거하고 깔끔하게 1번만 실행!)
+    let postTime = postData.created_at;
+    if (postTime) {
+        postTime = postTime.replace(" ", "T");
+        if (!postTime.endsWith("Z")) postTime += "Z";
+        postDate.textContent = new Date(postTime).toLocaleString();
+    } else {
+        postDate.textContent = "";
+    }
 
     if (chatWithAuthorBtn) {
         const currentUserId = await loadMyProfile(BASE_URL);

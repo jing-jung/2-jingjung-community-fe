@@ -20,13 +20,20 @@ function addCommentToDOM(comment, BASE_URL, showDeleteModal, elements) {
         `;
     }
 
+    // 🚀 시차 해결 로직 추가 (댓글 작성 시간)
+    let commentTime = comment.created_at;
+    if (commentTime) {
+        commentTime = commentTime.replace(" ", "T");
+        if (!commentTime.endsWith("Z")) commentTime += "Z";
+    }
+    const displayTime = commentTime ? new Date(commentTime).toLocaleString() : "";
+
     div.innerHTML = `
         <div class="comment-meta">
             <div class="comment-author-row">
                 <div class="profile-img" style="background-image: url('${profileUrl}');"></div>
                 <span class="target-nickname"></span> 
-                <span class="comment-date">${comment.created_at}</span>
-            </div>
+                <span class="comment-date">${displayTime}</span> </div>
             ${actionsHtml}
         </div>
         <div class="comment-content"></div>
@@ -34,7 +41,7 @@ function addCommentToDOM(comment, BASE_URL, showDeleteModal, elements) {
     
     div.querySelector(".target-nickname").textContent = comment.author_nickname;
     div.querySelector(".comment-content").textContent = comment.content;
-    // A bit of style fix
+    
     const profileDiv = div.querySelector(".profile-img");
     profileDiv.style.width = "24px";
     profileDiv.style.height = "24px";
@@ -52,16 +59,15 @@ function addCommentToDOM(comment, BASE_URL, showDeleteModal, elements) {
         delBtn.addEventListener("click", () => showDeleteModal(`comment_${comment.comment_id}`));
         
         editBtn.addEventListener("click", () => {
-                commentInput.value = div.querySelector(".comment-content").textContent;
-                commentInput.focus();
-                commentSubmitBtn.disabled = false;
-                commentSubmitBtn.classList.add("active");
-                commentSubmitBtn.textContent = "댓글 수정";
-                
-                // This state needs to be managed. We can pass a context object.
-                window.editModeCommentId = comment.comment_id;
-            });
-        }
+            commentInput.value = div.querySelector(".comment-content").textContent;
+            commentInput.focus();
+            commentSubmitBtn.disabled = false;
+            commentSubmitBtn.classList.add("active");
+            commentSubmitBtn.textContent = "댓글 수정";
+            
+            window.editModeCommentId = comment.comment_id;
+        });
+    }
 }
 
 async function loadComments(BASE_URL, postId, showDeleteModal, elements) {
