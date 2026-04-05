@@ -14,8 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const toastMessage = document.getElementById("toastMessage");
     const profileInput = document.getElementById("profileInput");
-    
     const emailText = document.querySelector(".email-text");
+
+    const profileImgCircle = document.querySelector(".profile-img-circle");
 
     let currentUserId = null;
 
@@ -38,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (emailText) emailText.textContent = user.email;
             nicknameInput.value = user.nickname;
 
-            const profileImgCircle = document.querySelector(".profile-img-circle"); // Get it here as it's page-specific
             const headerProfileIcon = document.getElementById("headerProfileIcon"); // Get it here as it's page-specific
             if (user.profile_image) {
                 let imgUrl = user.profile_image;
