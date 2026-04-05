@@ -27,10 +27,51 @@ document.addEventListener("DOMContentLoaded", async () => {
         deleteModal: document.getElementById("deleteModal"),
         modalCancelBtn: document.getElementById("modalCancelBtn"),
         modalConfirmBtn: document.getElementById("modalConfirmBtn"),
-        modalTitle: document.querySelector(".modal-title"),
-        chatWithAuthorBtn: document.getElementById("chatWithAuthorBtn")
+        modalTitle: document.querySelector(".modal-title")
     };
     
+    // acModal logic
+    const acModal = {
+        overlay: document.getElementById('ac-modal-overlay'),
+        message: document.getElementById('ac-modal-message'),
+        yesBtn: document.getElementById('ac-modal-yes'),
+        noBtn: document.getElementById('ac-modal-no'),
+        callback: null,
+
+        open: function(nickname, onConfirm) {
+            this.message.textContent = `${nickname}님에게 쪽지(1:1 채팅)를 보내시겠습니까?`;
+            this.callback = onConfirm;
+            this.overlay.classList.add('active');
+            this.overlay.style.display = 'flex';
+        },
+
+        close: function() {
+            this.overlay.classList.remove('active');
+            this.overlay.style.display = 'none';
+            this.callback = null;
+        },
+
+        init: function() {
+            this.noBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.close();
+            });
+
+            this.yesBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (this.callback) this.callback();
+                this.close();
+            });
+
+            this.overlay.addEventListener('click', (e) => {
+                if (e.target === this.overlay) this.close();
+            });
+        }
+    };
+    acModal.init();
+
     // 2. Get post ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const currentPostId = urlParams.get("id");
@@ -52,6 +93,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Init other modules after post data is loaded
         initActions(BASE_URL, currentPostId, elements);
         initComments(BASE_URL, currentPostId, showModalFn, elements);
+
+        // Bind click event to profile image for 1:1 chat
+        const authorImg = elements.authorProfileImg;
+        if (authorImg && !postData.is_owner) {
+            authorImg.style.cursor = "pointer";
+            authorImg.addEventListener("click", () => {
+                acModal.open(postData.author_nickname, () => {
+                    window.location.href = `chat.html?recipientId=${postData.user_id}`;
+                });
+            });
+        }
     }
     
     // 4. Set up general event listeners

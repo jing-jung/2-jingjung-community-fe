@@ -18,7 +18,7 @@ async function loadMyProfile(BASE_URL) {
 }
 
 async function renderPost(postData, elements, BASE_URL) {
-    const { postTitle, postText, authorName, postDate, authorProfileImg, postImagePlaceholder, likeCountElem, viewCountElem, commentCountElem, likeBtn, postEditBtn, postDeleteBtn, chatWithAuthorBtn } = elements;
+    const { postTitle, postText, authorName, postDate, authorProfileImg, postImagePlaceholder, likeCountElem, viewCountElem, commentCountElem, likeBtn, postEditBtn, postDeleteBtn } = elements;
     
     postTitle.textContent = postData.title || "제목 없음";
     postText.textContent = postData.contents || "내용 없음"; 
@@ -32,16 +32,6 @@ async function renderPost(postData, elements, BASE_URL) {
         postDate.textContent = new Date(postTime).toLocaleString();
     } else {
         postDate.textContent = "";
-    }
-
-    if (chatWithAuthorBtn) {
-        const currentUserId = await loadMyProfile(BASE_URL);
-        if (currentUserId && postData.user_id && postData.user_id !== currentUserId) {
-            chatWithAuthorBtn.style.display = "inline-block";
-            chatWithAuthorBtn.onclick = () => {
-                window.location.href = `chat.html?recipientId=${postData.user_id}`;
-            };
-        }
     }
     
     if (postData.author_profile_image && authorProfileImg) {

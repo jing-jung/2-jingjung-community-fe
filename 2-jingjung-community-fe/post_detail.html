@@ -6,9 +6,23 @@
     <title>아무 말 대잔치 - 게시글 상세</title>
     <link rel="stylesheet" href="./css/header.css">
     <link rel="stylesheet" href="./css/post_detail.css">
+    <link rel="stylesheet" href="./css/posts/modal.css">
 </head>
 <body>
     <div id="header-placeholder"></div>
+
+    <div id="ac-modal-overlay" class="ac-modal-overlay">
+        <div class="ac-modal">
+            <div class="ac-modal-content">
+                <div class="ac-leaf-icon">🍃</div>
+                <p id="ac-modal-message" class="ac-modal-text">이 텍스트는 JS에서 교체됩니다.</p>
+            </div>
+            <div class="ac-modal-actions">
+                <button id="ac-modal-no" class="ac-btn-no">아니, 안 할래</button>
+                <button id="ac-modal-yes" class="ac-btn-yes">응, 보낼게</button>
+            </div>
+        </div>
+    </div>
 
     <main class="container">
         <div class="post-header">
@@ -22,7 +36,6 @@
         <div class="author-info">
             <div class="profile-img"></div>
             <span id="authorName" class="author-name"></span>
-            <button id="chatWithAuthorBtn" class="chat-btn" style="display: none;">1:1 채팅</button>
             <span id="postDate" class="post-date"></span>
         </div>
 
