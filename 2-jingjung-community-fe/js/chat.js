@@ -104,6 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         messageInput.style.height = `${messageInput.scrollHeight}px`;
     });
 
+
     messageForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const messageText = messageInput.value.trim();
@@ -111,26 +112,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             const message = { content: messageText }; 
             websocket.send(JSON.stringify(message));
             
-            const sentMessage = {
-                content: messageText,
-                created_at: new Date().toISOString()
-            }
-            appendMessage(sentMessage, true);
-
             messageInput.value = '';
             sendBtn.disabled = true;
-            // Reset textarea height
             messageInput.style.height = 'auto';
         }
     });
 
+    // 2. 메시지 그리기 로직 (영국 시간 -> 한국 시간으로 변환!)
     function appendMessage(message, isSent) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', isSent ? 'sent' : 'received');
         
+        // 🚀 시간 시차 해결 로직 (Z를 붙여서 브라우저가 한국 시간으로 변환하게 만듦)
+        let serverTime = message.created_at;
+        if (serverTime) {
+            // "2026-04-05 05:45:00" 같은 형태라면 'Z'를 붙이기 위해 'T'로 연결
+            serverTime = serverTime.replace(" ", "T");
+            if (!serverTime.endsWith("Z")) {
+                serverTime += "Z"; 
+            }
+        } else {
+            // 시간 정보가 혹시 없으면 현재 시간
+            serverTime = new Date().toISOString();
+        }
+        
+        const dateObj = new Date(serverTime);
+        const timeString = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
         messageDiv.innerHTML = `
             <p class="message-content">${message.content}</p>
-            <span class="message-time">${new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <span class="message-time">${timeString}</span>
         `;
         messageContainer.appendChild(messageDiv);
         messageContainer.scrollTop = messageContainer.scrollHeight;
