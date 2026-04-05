@@ -21,7 +21,7 @@ async function renderPost(postData, elements, BASE_URL) {
     const { postTitle, postText, authorName, postDate, authorProfileImg, postImagePlaceholder, likeCountElem, viewCountElem, commentCountElem, likeBtn, postEditBtn, postDeleteBtn, chatWithAuthorBtn } = elements;
     
     postTitle.textContent = postData.title || "제목 없음";
-    postText.textContent = postData.content || "내용 없음";
+    postText.textContent = postData.contents || "내용 없음";
     authorName.textContent = postData.author_nickname || "익명";
     postDate.textContent = postData.created_at ? new Date(postData.created_at).toLocaleString() : "";
 
