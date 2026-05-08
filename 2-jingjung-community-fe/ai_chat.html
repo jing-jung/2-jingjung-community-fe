@@ -3,30 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>채팅</title>
-    <link rel="stylesheet" href="./css/header.css">
-    <link rel="stylesheet" href="./css/chat.css"> <!-- Ensure header styles are loaded -->
+    <title>여울이의 안내소 - 맛집 추천</title>
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/chat.css"> 
+    <style>
+        /* 여울이 컨셉 살짝 추가 */
+        .chat-header { background-color: #f8e182; padding: 15px; text-align: center; font-weight: bold; border-bottom: 3px solid #e1c15a; }
+        .bot-message { background-color: #fff; border: 2px solid #f8e182; border-radius: 15px; padding: 10px; margin: 10px 0; align-self: flex-start; max-width: 80%; }
+        .user-message { background-color: #dcf8c6; border-radius: 15px; padding: 10px; margin: 10px 0; align-self: flex-end; max-width: 80%; }
+        .map-link { display: inline-block; margin-top: 5px; padding: 5px 10px; background-color: #4CAF50; color: white; border-radius: 10px; text-decoration: none; font-size: 0.8em; }
+    </style>
 </head>
 <body>
-    <div id="header-placeholder"></div>
-
-    <div class="container">
-        <div class="chat-header">
-            <button id="back-btn" class="back-btn">&lt;</button>
-            <h2 id="recipient-nickname">채팅</h2>
-        </div>
-        <div id="message-container" class="message-container">
-            <!-- Messages will be loaded here -->
-            <p class="system-message">대화를 시작해보세요.</p>
-        </div>
-        <form id="message-form" class="message-input-form">
-            <textarea id="message-input" placeholder="메시지를 입력하세요..." rows="1"></textarea>
-            <button id="send-btn" type="submit" disabled><img src="images/leaf_1.png" alt="전송"></button>
-        </form>
+    <header id="header-container"></header> <div class="chat-header">
+        🐶 여울이의 마을 맛집 안내소
     </div>
 
-    <script type="module" src="./js/config.js"></script>
-    <script type="module" src="./js/header.js"></script> <!-- Load header logic -->
-    <script type="module" src="./js/chat.js"></script>
+    <main class="chat-main">
+        <div id="chat-box" class="chat-content" style="display: flex; flex-direction: column; padding: 20px; height: 70vh; overflow-y: auto;">
+            <div class="bot-message">
+                안녕하세요! 우리 마을 안내원 여울이에용! 🏕️<br>
+                어떤 맛집을 찾고 계신가요? (예: 강남구 파스타 맛집 추천해줘)
+            </div>
+        </div>
+
+        <div class="chat-input-area" style="padding: 10px; display: flex; border-top: 1px solid #ddd;">
+            <input type="text" id="chat-input" placeholder="여울이에게 물어보세요..." style="flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #ccc;">
+            <button id="send-btn" style="margin-left: 10px; padding: 10px 20px; border-radius: 20px; background-color: #f8e182; border: none; cursor: pointer;">전송</button>
+        </div>
+    </main>
+
+    <script src="js/config.js"></script> <script src="js/header.js"></script>
+    <script src="js/ai_chat.js"></script>
 </body>
 </html>

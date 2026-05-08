@@ -82,4 +82,11 @@ export function initMapModule(BASE_URL) {
             document.body.classList.remove("no-scroll");
         });
     }
+
+    const aiBtn = document.getElementById("ai-reco-btn");
+    if (aiBtn) {
+        aiBtn.addEventListener("click", () => {
+            window.location.href = "ai_chat.html";
+        });
+    }
 }
