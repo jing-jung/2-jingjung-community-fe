@@ -1,3 +1,3 @@
 export const CONFIG = {
-    BASE_URL: "http://k8s-myprojectgroup-d8b90bd933-1244394196.ap-southeast-2.elb.amazonaws.com/api"
+    BASE_URL: "http://127.0.0.1:8000"
 };

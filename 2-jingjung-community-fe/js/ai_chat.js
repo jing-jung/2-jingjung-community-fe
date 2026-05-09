@@ -1,3 +1,7 @@
+import { CONFIG } from './config.js';
+const BASE_URL = CONFIG.BASE_URL;
+import './header.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const chatBox = document.getElementById('chat-box');
     const chatInput = document.getElementById('chat-input');
