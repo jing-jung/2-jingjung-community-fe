@@ -12,11 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const msgDiv = document.createElement('div');
         msgDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
         
-        // 하이퍼링크 처리 (카카오맵 링크를 버튼처럼 변환)
-        const formattedText = text.replace(
-            /(https?:\/\/[^\s]+)/g, 
-            '<a href="$1" target="_blank" class="map-link">🗺️ 지도에서 보기</a>'
-        );
+        // 줄바꿈 문자를 <br>로 변환 및 하이퍼링크 처리 (카카오맵 링크를 버튼처럼 변환)
+        const formattedText = text
+            .replace(/(?:\r\n|\r|\n)/g, '<br>')
+            .replace(
+                /(https?:\/\/[^\s]+)/g, 
+                '<a href="$1" target="_blank" class="map-link">🗺️ 지도에서 보기</a>'
+            );
         
         msgDiv.innerHTML = formattedText;
         chatBox.appendChild(msgDiv);
