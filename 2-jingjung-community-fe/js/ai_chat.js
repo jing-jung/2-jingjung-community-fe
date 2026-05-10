@@ -12,13 +12,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const msgDiv = document.createElement('div');
         msgDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
         
-        // 줄바꿈 문자를 <br>로 변환 및 하이퍼링크 처리 (카카오맵 링크를 버튼처럼 변환)
-        const formattedText = text
-            .replace(/(?:\r\n|\r|\n)/g, '<br>')
+        // 텍스트 포맷팅
+        // 1. 간격 조정: 항목 사이는 한 줄 띄우기(\n\n), 마지막 멘트 앞은 두 줄 띄우기(\n\n\n)
+        let processedText = text
+            .replace(/(https?:\/\/[^\s]+)\s+(\d+\.)/g, '$1\n\n$2')
+            .replace(/(https?:\/\/[^\s]+)\s+([^\d\s])/g, '$1\n\n\n$2');
+
+        // 2. 링크 변환, 줄바꿈 변환, 마크다운 볼드체 처리
+        const formattedText = processedText
             .replace(
                 /(https?:\/\/[^\s]+)/g, 
                 '<a href="$1" target="_blank" class="map-link">🗺️ 지도에서 보기</a>'
-            );
+            )
+            .replace(/(?:\r\n|\r|\n)/g, '<br>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         
         msgDiv.innerHTML = formattedText;
         chatBox.appendChild(msgDiv);
