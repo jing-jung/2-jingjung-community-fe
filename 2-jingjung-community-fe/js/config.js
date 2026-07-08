@@ -17,9 +17,8 @@ const getBaseUrl = () => {
         return 'https://staging-api.yourdomain.com';
     }
     
-    // 프로덕션 (실제 도메인으로 변경 필요)
-    // 예: yourdomain.com → https://api.yourdomain.com
-    return window.location.protocol + '//' + hostname.replace(/^(www\.)?/, 'api.');
+    // 프로덕션 - AWS ELB 백엔드 URL
+    return 'http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com';
 };
 
 export const CONFIG = {
