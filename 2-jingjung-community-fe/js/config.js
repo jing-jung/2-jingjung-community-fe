@@ -17,8 +17,8 @@ const getBaseUrl = () => {
         return 'https://staging-api.yourdomain.com';
     }
     
-    // 프로덕션 - AWS ELB 백엔드 URL
-    return 'http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com';
+        // 프로덕션 - AWS ALB 통합 URL (Ingress)
+    return 'http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/api';
 };
 
 export const CONFIG = {
