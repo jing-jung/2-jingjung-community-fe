@@ -17,8 +17,9 @@ const getBaseUrl = () => {
         return 'https://staging-api.yourdomain.com';
     }
     
-        // 프로덕션 - AWS ALB 통합 URL (Ingress)
-    return 'http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/api';
+            // 프로덕션 - 백엔드 직접 ELB URL (임시)
+    // TODO: 백엔드에서 /api prefix 처리 후 통합 ALB URL로 변경
+    return 'http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com';
 };
 
 export const CONFIG = {
