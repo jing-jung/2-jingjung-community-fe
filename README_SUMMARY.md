@@ -1,3 +1,590 @@
+# 🚀 배포 전 최종 점검 체크리스트
+
+## 📋 현재 상태 분석
+
+### ✅ 프론트엔드 구조
+```
+2-jingjung-community-fe/
+├── 핵심 기능
+│   ├── login.js              ✅ /users/login (POST)
+│   ├── signup.js             ✅ /users/signup (POST)
+│   ├── posts/                ✅ /posts (GET, POST)
+│   ├── chat.js               ✅ /chats, /ws/{chat_id} (WebSocket)
+│   ├── matching.js           ✅ 매칭 기능
+│   └── header.js             ✅ /users/me (GET)
+│
+├── 고도화 모듈 (새로 추가)
+│   ├── config-enhanced.js    🆕 환경별 설정
+│   ├── utils.js              🆕 유틸리티 함수
+│   ├── monitoring.js         🆕 성능 모니터링
+│   ├── chat-enhanced.js      🆕 향상된 채팅
+│   ├── app.js                🆕 PWA 초기화
+│   └── sw.js                 🆕 Service Worker
+│
+└── 스타일
+    ├── enhanced-ui.css       🆕 로딩, 토스트, 스켈레톤
+    └── 기존 CSS 파일들
+```
+
+---
+
+## 🔍 백엔드 API 엔드포인트 점검
+
+### 필수 API 엔드포인트 (프론트엔드에서 사용 중)
+
+#### 1. 인증 API
+```
+POST   /users/login          # 로그인
+POST   /users/signup         # 회원가입
+POST   /users/logout         # 로그아웃
+GET    /users/me             # 현재 사용자 정보
+PUT    /users/profile        # 프로필 수정
+PUT    /users/password       # 비밀번호 변경
+```
+
+#### 2. 게시글 API
+```
+GET    /posts                # 게시글 목록
+GET    /posts/{id}           # 게시글 상세
+POST   /posts                # 게시글 작성
+PUT    /posts/{id}           # 게시글 수정
+DELETE /posts/{id}           # 게시글 삭제
+POST   /posts/{id}/like      # 좋아요
+GET    /posts/search         # 검색 (선택)
+```
+
+#### 3. 댓글 API
+```
+GET    /posts/{id}/comments  # 댓글 목록
+POST   /posts/{id}/comments  # 댓글 작성
+PUT    /comments/{id}        # 댓글 수정
+DELETE /comments/{id}        # 댓글 삭제
+```
+
+#### 4. 채팅 API
+```
+GET    /chats                # 채팅방 목록
+POST   /chats                # 채팅방 생성
+GET    /chats/{id}/messages  # 메시지 목록
+PUT    /chats/{id}/messages/{msg_id}/read  # 읽음 처리
+WS     /ws/{chat_id}         # WebSocket 연결
+```
+
+#### 5. 특수 기능 API (동숲 테마)
+```
+GET    /turnips              # 무 시세 조회
+POST   /turnips/buy          # 무 구매
+POST   /turnips/sell         # 무 판매
+GET    /trains               # 기차표 조회
+POST   /trains/reserve       # 기차표 예매
+GET    /matching             # 매칭 대상 조회
+POST   /matching/swipe       # 스와이프 (좋아요/싫어요)
+```
+
+#### 6. 모니터링 API (선택 - 고도화 기능)
+```
+POST   /metrics              # 성능 메트릭 전송
+POST   /errors               # 에러 로그 전송
+POST   /push/subscribe       # 푸시 알림 구독
+```
+
+---
+
+## ✅ 배포 전 필수 체크리스트
+
+### 1단계: 환경 설정 확인
+
+#### 프론트엔드 설정
+- [ ] **config.js 또는 config-enhanced.js에서 백엔드 URL 확인**
+  ```javascript
+  // 2-jingjung-community-fe/js/config.js
+  export const CONFIG = {
+      BASE_URL: "http://127.0.0.1:8000"  // ← 로컬 개발용
+  }
+  
+  // 프로덕션 배포 시:
+  // BASE_URL: "https://api.yourdomain.com"
+  ```
+
+- [ ] **백엔드 URL이 올바른지 확인**
+  - 로컬 개발: `http://127.0.0.1:8000` 또는 `http://localhost:8000`
+  - 프로덕션: `https://api.yourdomain.com`
+
+#### 백엔드 설정 (확인 필요)
+- [ ] **CORS 설정 확인**
+  ```python
+  # FastAPI main.py
+  from fastapi.middleware.cors import CORSMiddleware
+  
+  app.add_middleware(
+      CORSMiddleware,
+      allow_origins=[
+          "http://localhost",
+          "http://127.0.0.1",
+          "https://yourdomain.com"  # 프론트엔드 도메인
+      ],
+      allow_credentials=True,
+      allow_methods=["*"],
+      allow_headers=["*"],
+  )
+  ```
+
+- [ ] **세션/쿠키 설정 확인**
+  ```python
+  # credentials: "include" 사용을 위한 설정
+  # SameSite, Secure 플래그 확인
+  ```
+
+---
+
+### 2단계: 로컬 테스트
+
+#### 백엔드 실행
+```bash
+# FastAPI 백엔드 실행 (포트 8000)
+cd backend
+uvicorn main:app --reload --port 8000
+```
+
+#### 프론트엔드 실행
+```bash
+# 로컬 서버 실행 (포트 3000 또는 8080)
+cd 2-jingjung-community-fe
+python -m http.server 3000
+# 또는
+npx serve -p 3000
+```
+
+#### 테스트 항목
+- [ ] **로그인/회원가입 테스트**
+  1. 회원가입 → 성공 메시지 확인
+  2. 로그인 → posts.html로 리디렉션 확인
+  3. 브라우저 개발자 도구 → Application → Cookies에서 세션 쿠키 확인
+
+- [ ] **게시글 CRUD 테스트**
+  1. 게시글 목록 로딩 확인
+  2. 게시글 작성 → 목록에 표시 확인
+  3. 게시글 상세보기
+  4. 좋아요 버튼 작동 확인
+  5. 댓글 작성/삭제
+
+- [ ] **채팅 테스트**
+  1. 다른 사용자 프로필에서 채팅 시작
+  2. WebSocket 연결 확인 (개발자 도구 → Network → WS)
+  3. 메시지 전송/수신 확인
+  4. 페이지 새로고침 후 채팅 기록 유지 확인
+
+- [ ] **특수 기능 테스트**
+  1. 무 거래 (turnip.js)
+  2. 기차표 예매 (train.js)
+  3. 매칭 (matching.js)
+
+---
+
+### 3단계: 네트워크 연결 점검
+
+#### Chrome DevTools 사용
+```
+1. F12 키 → Network 탭
+2. 페이지 새로고침
+3. 확인 항목:
+   - Status Code가 모두 200 또는 304인지 확인
+   - CORS 에러 (빨간색) 없는지 확인
+   - WebSocket 연결 (Type: websocket) 확인
+```
+
+#### 주요 확인 사항
+- [ ] **API 요청 성공 확인**
+  ```
+  GET  /users/me          → 200 OK
+  GET  /posts             → 200 OK
+  POST /users/login       → 200 OK
+  WS   /ws/1              → 101 Switching Protocols
+  ```
+
+- [ ] **에러 확인**
+  - 401 Unauthorized → 로그인 필요
+  - 403 Forbidden → 권한 없음
+  - 404 Not Found → 엔드포인트 오타
+  - 500 Internal Server Error → 백엔드 에러
+
+- [ ] **CORS 에러 확인**
+  ```
+  ❌ "Access to fetch at ... has been blocked by CORS policy"
+  → 백엔드 CORS 설정 확인 필요
+  ```
+
+---
+
+### 4단계: 보안 점검
+
+- [ ] **HTTPS 사용 (프로덕션)**
+  - 프로덕션 환경에서는 반드시 HTTPS 사용
+  - HTTP → HTTPS 자동 리디렉션 설정
+
+- [ ] **쿠키 보안 설정**
+  ```python
+  # 백엔드 (FastAPI)
+  response.set_cookie(
+      key="session_id",
+      value=session_id,
+      httponly=True,     # XSS 방어
+      secure=True,       # HTTPS only (프로덕션)
+      samesite="lax"     # CSRF 방어
+  )
+  ```
+
+- [ ] **입력 검증**
+  - XSS 방어: 프론트엔드에서 `textContent` 사용
+  - SQL Injection 방어: 백엔드에서 Parameterized Query 사용
+
+---
+
+### 5단계: 성능 점검
+
+#### Lighthouse 실행
+```
+Chrome DevTools → Lighthouse → Generate Report
+
+목표 점수:
+- Performance: 90+
+- Accessibility: 90+
+- Best Practices: 90+
+- SEO: 80+
+```
+
+#### 확인 사항
+- [ ] **초기 로딩 시간 < 3초**
+- [ ] **이미지 최적화 (WebP, 압축)**
+- [ ] **JavaScript 번들 크기 < 500KB**
+- [ ] **Service Worker 등록 확인** (PWA)
+
+---
+
+## 🐛 자주 발생하는 문제 해결
+
+### 문제 1: "Failed to fetch" 에러
+**원인**: 백엔드가 실행되지 않았거나 URL이 잘못됨  
+**해결**:
+```bash
+# 백엔드 실행 확인
+curl http://127.0.0.1:8000/health
+
+# 또는 브라우저에서 직접 접속
+http://127.0.0.1:8000/docs  # FastAPI Swagger UI
+```
+
+---
+
+### 문제 2: CORS 에러
+**원인**: 백엔드에서 프론트엔드 Origin을 허용하지 않음  
+**해결**:
+```python
+# main.py
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # 프론트엔드 포트
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+---
+
+### 문제 3: 로그인 후 /users/me에서 401 에러
+**원인**: 쿠키가 전송되지 않음  
+**해결**:
+```javascript
+// 모든 fetch 요청에 credentials: "include" 추가
+fetch(`${BASE_URL}/users/me`, {
+    credentials: "include"  // ← 필수!
+})
+```
+
+---
+
+### 문제 4: WebSocket 연결 실패
+**원인**: WebSocket URL이 잘못됨 또는 백엔드가 WebSocket을 지원하지 않음  
+**해결**:
+```javascript
+// HTTP → WS로 변환 확인
+const WS_BASE_URL = CONFIG.BASE_URL.replace("http://", "ws://");
+// https:// → wss://
+const WS_BASE_URL = CONFIG.BASE_URL.replace("https://", "wss://");
+```
+
+**백엔드 확인**:
+```python
+# FastAPI WebSocket 엔드포인트 확인
+@app.websocket("/ws/{chat_id}")
+async def websocket_endpoint(websocket: WebSocket, chat_id: int):
+    await websocket.accept()
+    # ...
+```
+
+---
+
+### 문제 5: 이미지 업로드 실패
+**원인**: Content-Type이 잘못되었거나 파일 크기 제한 초과  
+**해결**:
+```javascript
+// FormData 사용
+const formData = new FormData();
+formData.append('file', imageFile);
+
+fetch(`${BASE_URL}/posts`, {
+    method: 'POST',
+    body: formData,  // Content-Type 자동 설정
+    credentials: "include"
+});
+```
+
+---
+
+## 🚀 Docker 배포
+
+### Dockerfile 확인
+```dockerfile
+# 2-jingjung-community-fe/Dockerfile
+FROM nginx:alpine
+
+# 프론트엔드 파일 복사
+COPY ./2-jingjung-community-fe/ /usr/share/nginx/html/
+
+# login.html을 index.html로 설정
+RUN cp /usr/share/nginx/html/login.html /usr/share/nginx/html/index.html
+
+EXPOSE 80
+```
+
+### 빌드 및 실행
+```bash
+# 이미지 빌드
+docker build -t community-fe:latest .
+
+# 로컬 테스트
+docker run -p 8080:80 community-fe:latest
+
+# 브라우저에서 확인
+http://localhost:8080
+```
+
+---
+
+## ☸️ Kubernetes 배포
+
+### 배포 전 확인
+- [ ] **ECR 또는 Docker Hub에 이미지 푸시**
+  ```bash
+  # AWS ECR 예시
+  aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 016562553479.dkr.ecr.ap-southeast-2.amazonaws.com
+  
+  docker tag community-fe:latest 016562553479.dkr.ecr.ap-southeast-2.amazonaws.com/community-fe:latest
+  
+  docker push 016562553479.dkr.ecr.ap-southeast-2.amazonaws.com/community-fe:latest
+  ```
+
+- [ ] **frontend-deployment.yaml 확인**
+  ```yaml
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: frontend-deployment
+  spec:
+    replicas: 2
+    selector:
+      matchLabels:
+        app: frontend
+    template:
+      metadata:
+        labels:
+          app: frontend
+      spec:
+        containers:
+          - name: frontend-container
+            image: "016562553479.dkr.ecr.ap-southeast-2.amazonaws.com/community-fe:latest"
+            ports:
+              - containerPort: 80
+  ```
+
+- [ ] **배포**
+  ```bash
+  kubectl apply -f frontend-deployment.yaml
+  
+  # 상태 확인
+  kubectl get pods
+  kubectl get services
+  
+  # 로그 확인
+  kubectl logs -f deployment/frontend-deployment
+  ```
+
+---
+
+## 🔍 프로덕션 환경 설정
+
+### 프론트엔드 config.js 수정
+```javascript
+// 환경 변수 또는 빌드 시 자동 설정
+export const CONFIG = {
+    BASE_URL: process.env.API_URL || "https://api.yourdomain.com"
+}
+
+// 또는 config-enhanced.js 사용 (자동 환경 감지)
+const getEnvironmentConfig = () => {
+    const hostname = window.location.hostname;
+    
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return { BASE_URL: 'http://127.0.0.1:8000' };
+    }
+    
+    // 프로덕션
+    return { BASE_URL: 'https://api.yourdomain.com' };
+};
+```
+
+---
+
+## 📊 배포 후 모니터링
+
+### 1. 헬스 체크
+```bash
+# 프론트엔드 접속 확인
+curl https://yourdomain.com
+
+# 백엔드 API 확인
+curl https://api.yourdomain.com/health
+```
+
+### 2. 브라우저 콘솔 확인
+```javascript
+// F12 → Console 탭
+// 에러 메시지 없는지 확인
+// 특히 CORS 에러, 404 에러 확인
+```
+
+### 3. 성능 측정
+- [ ] **Lighthouse 실행**
+- [ ] **GTmetrix 또는 WebPageTest**
+- [ ] **실제 사용자 테스트**
+
+---
+
+## ✅ 최종 체크리스트
+
+### 배포 전 필수
+- [ ] 백엔드 API 엔드포인트 모두 작동 확인
+- [ ] 프론트엔드 config.js에서 백엔드 URL 확인
+- [ ] CORS 설정 확인
+- [ ] 로그인/회원가입 테스트
+- [ ] 게시글 CRUD 테스트
+- [ ] 채팅/WebSocket 테스트
+- [ ] Docker 이미지 빌드 성공
+- [ ] 로컬 Docker 컨테이너 실행 테스트
+
+### 배포 후 필수
+- [ ] 프로덕션 URL 접속 확인
+- [ ] 로그인 테스트
+- [ ] 주요 기능 동작 확인
+- [ ] 브라우저 콘솔 에러 없는지 확인
+- [ ] Lighthouse 점수 확인 (90+)
+- [ ] 로그 모니터링 설정
+
+---
+
+## 🎯 종합 평가
+
+### 프론트엔드 현재 상태
+- ✅ **기본 기능**: 로그인, 게시글, 댓글, 채팅 모두 구현됨
+- ✅ **특수 기능**: 무 거래, 기차표, 매칭 구현됨
+- ✅ **보안**: XSS 방어, credentials 사용
+- ⚠️ **성능**: 이미지 최적화, 코드 스플리팅 추가 권장
+- ⚠️ **모니터링**: 에러 추적 시스템 추가 권장
+
+### 백엔드 연동 상태 (확인 필요)
+- ❓ **API 엔드포인트**: 모든 엔드포인트 작동하는지 확인 필요
+- ❓ **WebSocket**: /ws/{chat_id} 작동 확인 필요
+- ❓ **CORS**: allow_origins 설정 확인 필요
+- ❓ **세션/쿠키**: credentials: "include" 작동 확인 필요
+
+### 배포 준비도
+- ✅ **Dockerfile**: 완성됨
+- ✅ **Kubernetes YAML**: 완성됨
+- ⚠️ **환경 변수**: 프로덕션 URL로 변경 필요
+- ⚠️ **HTTPS**: 인증서 설정 필요 (프로덕션)
+
+---
+
+## 🚀 배포 시작!
+
+### 1단계: 로컬 테스트 (30분)
+```bash
+# 백엔드 실행
+cd backend
+uvicorn main:app --reload
+
+# 프론트엔드 실행 (새 터미널)
+cd 2-jingjung-community-fe
+python -m http.server 3000
+
+# 브라우저에서 테스트
+http://localhost:3000
+```
+
+### 2단계: Docker 빌드 (10분)
+```bash
+docker build -t community-fe:latest .
+docker run -p 8080:80 community-fe:latest
+
+# 테스트
+http://localhost:8080
+```
+
+### 3단계: Kubernetes 배포 (20분)
+```bash
+# 이미지 푸시
+docker push your-registry/community-fe:latest
+
+# 배포
+kubectl apply -f frontend-deployment.yaml
+
+# 확인
+kubectl get pods
+kubectl get services
+```
+
+### 4단계: 프로덕션 테스트 (30분)
+- 실제 URL 접속
+- 전체 기능 테스트
+- 성능 측정
+
+---
+
+## 📞 문제 발생 시
+
+1. **백엔드 로그 확인**
+   ```bash
+   # Docker
+   docker logs -f container-id
+   
+   # Kubernetes
+   kubectl logs -f deployment/backend-deployment
+   ```
+
+2. **프론트엔드 브라우저 콘솔 확인**
+   - F12 → Console 탭
+   - Network 탭에서 실패한 요청 확인
+
+3. **네트워크 연결 확인**
+   ```bash
+   # 프론트엔드에서 백엔드 접속 가능한지
+   curl https://api.yourdomain.com/health
+   ```
+
+---
+
+**배포 준비 완료! 시작하세요! 🚀**
 # 🚀 대규모 트래픽 대응 아키텍처 분석 및 고도화 완료
 
 ## 📊 프로젝트 개요
