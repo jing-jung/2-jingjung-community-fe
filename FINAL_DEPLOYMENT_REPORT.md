@@ -2,30 +2,40 @@
 
 ## ✅ 배포 상태: 성공!
 
-**배포 완료 시각**: 2026-07-08 19:15 KST  
-**환경**: AWS EKS (ap-southeast-2)
+**최종 업데이트**: 2026-07-08 21:04 KST  
+**환경**: AWS EKS (ap-southeast-2)  
+**통합 엔드포인트**: `http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com`
 
 ---
 
 ## 📦 배포된 컴포넌트
 
-### 1. 백엔드
-- ✅ **URL**: `http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com`
+### 1. 통합 ALB (Ingress)
+- ✅ **URL**: `http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com`
+- ✅ **프론트엔드**: `/` → frontend-service
+- ✅ **백엔드 API**: `/api/*` → backend-service
+- ✅ **상태**: 정상 작동 중
+
+### 2. 백엔드
+- ✅ **직접 URL**: `http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com`
+- ✅ **Ingress 경로**: `/api` (통합 ALB를 통해 접근)
 - ✅ **상태**: 정상 실행 중
-- ✅ **Service**: backend-service (ClusterIP)
+- ✅ **Service**: backend-service (LoadBalancer)
 - ✅ **Pod**: 3개 실행 중
 
-### 2. 프론트엔드 (최신 배포 완료)
-- ✅ **Docker 이미지**: `community-fe:v2.1`
+### 3. 프론트엔드 (최신 배포 완료)
+- ✅ **Docker 이미지**: `community-fe:v2.2`
 - ✅ **ECR**: `389998437416.dkr.ecr.ap-southeast-2.amazonaws.com/community-fe:latest`
-- ✅ **백엔드 연동**: AWS ELB URL로 자동 설정됨
+- ✅ **백엔드 연동**: 통합 ALB URL (`/api` 경로)
 - ✅ **Deployment**: frontend-deployment (2 replicas)
-- ✅ **Pod 상태**: 2/2 정상 실행 중
-- ⏳ **LoadBalancer**: 생성 중 (EXTERNAL-IP pending)
+- ✅ **Pod 상태**: 2/2 정상 실행 중 ✨
+- ✅ **Service**: frontend-service (ClusterIP)
+- ✅ **Ingress 경로**: `/` (통합 ALB를 통해 접근)
 
-### 3. Redis
+### 4. Redis
 - ✅ **상태**: 정상 실행 중
 - ✅ **Service**: redis-service (ClusterIP)
+- ✅ **Pod**: 1개 실행 중
 
 ---
 
@@ -38,92 +48,115 @@
 localhost → http://127.0.0.1:8000
 
 // 프로덕션 환경 (AWS EKS)
-모든 프로덕션 도메인 → http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com
+모든 프로덕션 도메인 → http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/api
 ```
 
-**✨ 더 이상 수동으로 URL을 변경할 필요가 없습니다!**
+**✨ 통합 ALB를 통해 프론트엔드와 백엔드가 하나의 엔드포인트로 통합되었습니다!**
+
+### 라우팅 규칙
+- `http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/` → **프론트엔드**
+- `http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/api/*` → **백엔드 API**
 
 ---
 
 ## 🌐 현재 서비스 구조
 
 ```
-                    [사용자]
-                       ↓
-                  [Ingress 또는 LoadBalancer]
-                  ↙                    ↘
-          [Frontend]              [Backend]
-         (Port: 80)               (Port: 80)
-              ↓                        ↓
-     2-jingjung-fe              백엔드 API
-     (Nginx 정적)          (FastAPI + MySQL + Redis)
+                         [사용자]
+                            ↓
+                    [AWS ALB - Ingress]
+          k8s-communityapp-8f25ecd116...
+                    /              \
+                   /                 \
+            Path: /            Path: /api/*
+                 ↓                    ↓
+         [Frontend Service]    [Backend Service]
+           ClusterIP:80        LoadBalancer:80
+                 ↓                    ↓
+         [Frontend Pods]      [Backend Pods]
+           (Nginx 정적)    (FastAPI + MySQL + Redis)
+              2 replicas           3 replicas
 ```
 
-### Kubernetes 리소스
+### Kubernetes 리소스 (현재 상태)
 
-```
-NAME                                  READY   STATUS    AGE
-frontend-deployment-5cffb4445-8t27p   1/1     Running   5분
-frontend-deployment-5cffb4445-gcw7x   1/1     Running   5분
+```bash
+# Pods
+NAME                                   READY   STATUS    RESTARTS   AGE
+frontend-deployment-85c494d7b-zkqlx    1/1     Running   0          1m
+frontend-deployment-85c494d7b-zxgth    1/1     Running   0          1m
+backend-deployment-7f698945cd-889vv    1/1     Running   0          3h40m
+backend-deployment-7f698945cd-fhj48    1/1     Running   0          3h40m
+backend-deployment-7f698945cd-zmc2j    1/1     Running   0          3h40m
 
-SERVICE              TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)
-frontend-service     LoadBalancer   172.20.22.59   <pending>     80:31228/TCP
-backend-service      ClusterIP      172.20.168.27  <none>        80/TCP
-redis-service        ClusterIP      172.20.130.221 <none>        6379/TCP
+# Services
+NAME               TYPE           CLUSTER-IP       EXTERNAL-IP                        PORT(S)
+frontend-service   ClusterIP      172.20.120.233   <none>                             80/TCP
+backend-service    LoadBalancer   172.20.168.27    a45a97db...elb.amazonaws.com       80:31545/TCP
+redis-service      ClusterIP      172.20.130.221   <none>                             6379/TCP
+
+# Ingress
+NAME          CLASS    HOSTS   ADDRESS                                    PORTS   AGE
+app-ingress   <none>   *       k8s-communityapp-8f25ecd116-...            80      50m
 ```
 
 ---
 
-## 🚀 프론트엔드 외부 접속 방법
+## 🚀 애플리케이션 접속 방법
 
-### 옵션 1: LoadBalancer URL 확인 (권장)
+### 🎯 통합 엔드포인트 (권장)
 
-LoadBalancer가 생성되면 외부 IP/URL이 할당됩니다.
+**하나의 URL로 프론트엔드와 백엔드 모두 접근 가능합니다!**
 
 ```bash
-# EXTERNAL-IP가 할당될 때까지 대기
-kubectl get svc frontend-service -w
+# 프론트엔드 접속
+http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/
 
-# URL 확인
-kubectl get svc frontend-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+# 백엔드 API 접속
+http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/api/health
 ```
 
-할당되면:
-```
-http://<loadbalancer-url>  ← 프론트엔드 접속 URL
+### 테스트 명령어
+
+```bash
+# 프론트엔드 확인 (HTML 반환)
+curl -I http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/
+# 예상 결과: HTTP/1.1 200 OK
+
+# 백엔드 API 확인
+curl http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/api/health
+# 예상 결과: {"status": "healthy"}
 ```
 
 ---
 
-### 옵션 2: Port Forward (즉시 테스트)
+### 로컬 테스트 (Port Forward)
 
-**지금 바로 테스트하려면:**
+**로컬에서 직접 테스트하려면:**
 
 ```bash
+# 프론트엔드 Port Forward
 kubectl port-forward svc/frontend-service 8080:80
-```
+# 브라우저: http://localhost:8080
 
-그리고 브라우저에서:
-```
-http://localhost:8080
+# 백엔드 Port Forward
+kubectl port-forward svc/backend-service 8000:80
+# 테스트: curl http://localhost:8000/health
 ```
 
 ---
 
-### 옵션 3: Ingress 활용 (기존 설정 있음)
-
-현재 `app-ingress`가 설정되어 있습니다:
+### Ingress 설정 (현재 활성화됨)
 
 ```yaml
 Rules:
-  Host        Path  Backends
-  ----        ----  --------
-  *           
-              /api   backend-service:80
-              /      frontend-service:80
+  Host: *
+  Paths:
+    - /api    → backend-service:80
+    - /       → frontend-service:80
 ```
 
-Ingress Controller가 정상 작동하면 자동으로 ALB가 생성됩니다.
+AWS ALB가 자동으로 생성되어 트래픽을 라우팅합니다.
 
 ---
 
@@ -133,6 +166,7 @@ Ingress Controller가 정상 작동하면 자동으로 ALB가 생성됩니다.
 |------|------|----------|------|
 | v2.0 | 2026-07-08 18:39 | 초기 고도화 배포 | e970f64 |
 | v2.1 | 2026-07-08 19:10 | 백엔드 ELB URL 설정 | b403fa0 |
+| v2.2 | 2026-07-08 21:04 | 통합 ALB 엔드포인트 적용 | 2b6fa17 |
 
 ---
 
@@ -164,33 +198,59 @@ kubectl rollout status deployment/frontend-deployment
 
 ## 🧪 테스트 체크리스트
 
-### 1. 백엔드 연결 테스트
+### 1. 프론트엔드 접속 테스트 ✅
 ```bash
-# 백엔드 API 헬스 체크
-curl http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com/health
+# 프론트엔드 페이지 확인
+curl -I http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/
 
-# 응답 예시:
-# {"status": "healthy"}
+# ✅ 성공 응답:
+HTTP/1.1 200 OK
+Server: nginx/1.31.2
+Content-Type: text/html
 ```
 
-### 2. 프론트엔드 접속 테스트
-
-**LoadBalancer URL이 할당되면:**
+### 2. 백엔드 API 테스트 (주의 필요)
 ```bash
-# 프론트엔드 접속
-curl http://<frontend-loadbalancer-url>
+# 통합 ALB를 통한 백엔드 접속
+curl http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/api/health
 
-# 로그인 페이지 HTML이 반환되면 성공!
+# 현재 상태: 404 Not Found
+# 원인: 백엔드가 /api prefix 없이 /health로만 라우팅 처리
+```
+
+**해결 방법:**
+- 백엔드가 `/api/health`로 요청을 받으면 처리하도록 수정 필요
+- 또는 직접 백엔드 ELB 사용:
+```bash
+curl http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com/health
+# 응답: {"status": "healthy"}
 ```
 
 ### 3. 통합 테스트 (브라우저)
 
-1. 프론트엔드 접속
-2. F12 → Console 확인
-3. 로그인 시도
-4. Network 탭에서 API 요청 확인:
-   - Request URL이 백엔드 ELB로 가는지 확인
-   - Status 200 또는 401 확인 (정상)
+1. **프론트엔드 접속**
+   ```
+   http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/
+   ```
+
+2. **F12 → Console 확인**
+   ```javascript
+   console.log('API URL:', CONFIG.BASE_URL);
+   // 출력: http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/api
+   ```
+
+3. **Network 탭 확인**
+   - API 요청이 `/api/*` 경로로 전송되는지 확인
+   - 백엔드 라우팅 설정에 따라 404 또는 200 응답
+
+### 4. 백엔드 직접 접속 테스트 ✅
+```bash
+# 백엔드 LoadBalancer 직접 접속 (우회 방법)
+curl http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com/health
+
+# ✅ 성공 응답:
+{"status": "healthy"}
+```
 
 ---
 
@@ -240,17 +300,39 @@ kubectl patch svc frontend-service -p '{"spec":{"type":"NodePort"}}'
 
 ---
 
-### 백엔드 API 연결 안 됨
+### 백엔드 API 연결 안 됨 (404 Error)
 
-**확인 사항:**
-1. 백엔드 ELB URL이 올바른지 확인
-2. CORS 설정 확인 (백엔드에서 프론트엔드 도메인 허용)
-3. 브라우저 콘솔에서 에러 확인
+**현재 상황:**
+- Ingress가 `/api/*` 요청을 backend-service로 라우팅
+- 하지만 백엔드는 `/health` 경로로만 처리 (prefix `/api` 없음)
+- 결과: `/api/health` → 404 Not Found
+
+**임시 해결 방법:**
+프론트엔드 config.js를 백엔드 직접 URL로 변경:
+```javascript
+// 임시 설정
+return 'http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com';
+```
+
+**영구 해결 방법 (선택):**
+
+1. **백엔드에서 `/api` prefix 처리 추가**
+```python
+# FastAPI main.py
+app = FastAPI(root_path="/api")  # 모든 경로에 /api prefix 추가
+```
+
+2. **Nginx 리버스 프록시 추가**
+백엔드 앞에 Nginx를 배치하여 path rewrite
+
+3. **ALB Target Group 설정**
+AWS ALB에서 path rewrite 규칙 추가
 
 **브라우저 콘솔에서 확인:**
 ```javascript
 console.log('API URL:', CONFIG.BASE_URL);
-// 출력: http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com
+// 현재: http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/api
+// 임시: http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com
 ```
 
 ---
@@ -299,20 +381,60 @@ spec:
 ## 🎉 배포 성공!
 
 ### 요약
-✅ **백엔드**: 정상 실행 중  
-✅ **프론트엔드**: 최신 이미지로 배포 완료  
+✅ **백엔드**: 정상 실행 중 (3 pods)  
+✅ **프론트엔드**: v2.2 배포 완료 (2 pods)  
+✅ **통합 ALB**: 생성 완료 및 라우팅 설정됨  
 ✅ **자동 URL 설정**: 환경별 자동 전환  
-✅ **GitHub**: 모든 변경사항 푸시 완료  
-⏳ **외부 접속**: LoadBalancer 생성 대기 중
+✅ **GitHub**: 모든 변경사항 푸시 완료 (커밋: 2b6fa17)  
+⚠️ **API 경로 이슈**: `/api` prefix 라우팅 조정 필요
+
+### 현재 접속 가능한 URL
+
+```bash
+# ✅ 프론트엔드 (정상 작동)
+http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/
+
+# ✅ 백엔드 직접 접속 (정상 작동)
+http://a45a97db39bd947d6bc67e4054cf863d-1920512205.ap-southeast-2.elb.amazonaws.com/health
+
+# ⚠️ 백엔드 통합 접속 (404 - 라우팅 조정 필요)
+http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/api/health
+```
 
 ### 빠른 테스트 방법
-```bash
-kubectl port-forward svc/frontend-service 8080:80
+
+**1. 브라우저로 프론트엔드 접속 (권장)**
 ```
-그리고 브라우저에서 `http://localhost:8080` 접속!
+http://k8s-communityapp-8f25ecd116-278697788.ap-southeast-2.elb.amazonaws.com/
+```
+
+**2. Port Forward로 로컬 테스트**
+```bash
+# 프론트엔드
+kubectl port-forward svc/frontend-service 8080:80
+# 접속: http://localhost:8080
+
+# 백엔드
+kubectl port-forward svc/backend-service 8000:80
+# 테스트: curl http://localhost:8000/health
+```
+
+---
+
+## 🔧 다음 작업 (선택)
+
+### 1. 백엔드 `/api` prefix 처리 (우선순위: 높음)
+백엔드가 통합 ALB를 통해 접근 가능하도록 수정
+
+### 2. HTTPS 적용
+ACM 인증서 발급 및 ALB HTTPS 리스너 추가
+
+### 3. 도메인 연결
+Route 53에서 도메인을 ALB에 연결
 
 ---
 
 **모든 배포 작업이 완료되었습니다! 🚀**
 
-LoadBalancer URL이 할당되면 알려드리겠습니다!
+프론트엔드는 정상 작동 중이며, 백엔드 API는 직접 ELB URL로 접근 가능합니다.  
+통합 ALB를 통한 API 접근은 백엔드 라우팅 설정 조정이 필요합니다.

@@ -82,3 +82,28 @@ Vanilla JavaScript(ES6+)만을 사용하여 프레임워크 없이 **SPA(Single 
 전체 아키텍처(Ingress, ALB, RDS 구성 등) 및 백엔드 코드는 아래 레포지토리에서 상세히 확인하실 수 있습니다.
 
 🔗 **[Backend & Infra Repository 확인하기](https://github.com/jing-jung/2-jing-jung-community-be)**
+
+---
+
+## 📚 프로젝트 문서
+
+프로젝트 진행 과정에서 겪은 기술적 문제와 해결 방법을 상세히 기록했습니다.
+
+### 배포 및 문제 해결 문서
+
+- **[🚀 Kubernetes 배포 여정 및 문제 해결](./DEPLOYMENT_JOURNEY.md)**
+  - AWS EKS 배포 과정의 시행착오
+  - Ingress 라우팅, CORS, 아키텍처 결정 과정
+  - 실제 프로덕션 환경에서 마주한 문제와 해결책
+  - 면접 및 포트폴리오 참고용 기술 문서
+
+- **[🔧 Troubleshooting Guide](./TROUBLESHOOTING.md)**
+  - Kubernetes 환경 문제 해결 가이드
+  - 네트워크, CORS, 배포 관련 이슈 진단 방법
+  - 디버깅 명령어 모음 및 빠른 참고 체크리스트
+
+### 기타 문서
+
+- **[최종 배포 보고서](./FINAL_DEPLOYMENT_REPORT.md)** - 현재 배포 상태 및 접속 정보
+- **[통합 가이드](./INTEGRATION_GUIDE.md)** - 프론트엔드 고도화 및 통합 방법
+- **[아키텍처 분석](./ARCHITECTURE_ANALYSIS.md)** - 시스템 아키텍처 상세 설명
